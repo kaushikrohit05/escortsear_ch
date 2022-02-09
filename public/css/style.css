@@ -1,0 +1,8 @@
+body{ font-size: 18px;}
+.postadd_btn{     background-color: #c11768;
+    background-image: linear-gradient(to right,#c11768,#ff007a);
+    cursor: pointer;
+    color: #fff!important;
+    font-weight: 700;
+    letter-spacing: 1px; 
+padding:10px 30px ;}
