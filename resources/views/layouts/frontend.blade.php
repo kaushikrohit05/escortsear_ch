@@ -21,10 +21,6 @@
           <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="/">Home</a>
           </li>
-           
-
-         
-          
         </ul>
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
           
@@ -52,7 +48,7 @@
           </li>
           @endif
           <li class="nav-item">
-            <a class="nav-link" href="/postadd"><span class="postadd_btn">Post Ads <i class="fas fa-long-arrow-alt-right"></i></span></a>
+            <a class="nav-link" href="/postadd"><span class="postadd_btn">Post Your Ad <i class="fas fa-long-arrow-alt-right"></i></span></a>
           </li>          
         </ul>         
       </div>
@@ -60,7 +56,35 @@
   </nav>
     <div class="container">
         @yield('content')
-    </div> 
+    </div>
+    
+    
+    <footer class="footer-section mt-5">
+      <div class="container">
+          <div class="row">
+              <div class="col my-3 text-center">
+                   
+      <a data-href="/terms-and-conditions" class="clickable">Terms and Conditions</a> | <a data-href="/privacy-policy" class="clickable">Privacy Policy</a> | <a data-href="/contacts-us" class="clickable">Contacts Us</a>
+                 
+              </div>
+          </div>
+          <div class="row copy-right-section">
+              <div class="col my-3 text-center">
+                   <a target="_blank" href="" title="Facebook"><i class="fab fa-facebook fa-2x"></i></a>
+                   <a target="_blank" href="#" title="Twitter"><i class="fab fa-twitter fa-2x"></i></a>
+                  <a target="_blank" href="#" title="Instagram"><i class="fab fa-instagram fa-2x"></i></a>
+                      
+              </div>
+          </div>
+      </div>
+      <a href="#" id="scrollToTop" >
+        <i class="fas fa-arrow-alt-circle-up fa-2x"></i>
+      </a>
+    
+  </footer>   
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<script src="{{asset('js/jquery.min.js')}}"></script>
+<script src="{{asset('js/custom.js')}}"></script>
+<script src="{{asset('src/js/lightbox-plus-jquery.min.js')}}"></script>
 </body>
 </html>

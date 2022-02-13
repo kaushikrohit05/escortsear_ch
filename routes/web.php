@@ -21,7 +21,14 @@ use App\Http\Controllers\UsersController;
 
 Route::get('/',[MainController::class,'index']);
 Route::get('/category/{id}',[MainController::class,'category']);
+Route::get('/ad/{id}',[MainController::class,'ad_detail']);
+
+
 Route::get('/postadd',[MainController::class,'postadd']); 
+Route::get('/adgallery/{id}',[MainController::class,'adgallery']);
+Route::post('/savegallery/{id}',[MainController::class,'savegallery']);
+Route::get('/postsuccess/',[MainController::class,'postsuccess']);
+
 
 Route::post('/registeraction',[MainController::class,'register_action']); 
 Route::post('/loginaction',[MainController::class,'login_action'])->name('loginaction');
@@ -30,11 +37,14 @@ Route::get('/logout',[MainController::class,'logout'])->name('logout');
 Route::get('/login',[MainController::class,'login'])->name('login');
 Route::get('/signup',[MainController::class,'signup'])->name('signup');
 
+Route::post('/savead',[MainController::class,'save_ad']);
+Route::post('/saveadwithuser',[MainController::class,'new_user_new_ad']);
 
 Route::group(['middleware'=>['UserCheck']], function(){
 
     Route::get('/myaccount',[MainController::class,'myaccount']);
     Route::get('/profile',[MainController::class,'profile']);
+    Route::get('/user/ads',[MainController::class,'user_ads']);
 }); 
 
 //////////////ADMIN ROUTES //////////////////////////////////////

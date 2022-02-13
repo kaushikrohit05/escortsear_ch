@@ -1,44 +1,22 @@
 @extends('layouts/frontend')
 
 @section('content')
-<div class="row">
-    <div class="col-md-4"></div>
-    <div class="col-md-4">
-<h1>My Account</h1>
-<form method="POST" action="/registeraction" >
-    @csrf
-    <div class="mb-3">
-      <label for="exampleInputEmail1" class="form-label">First Name</label>
-      <input type="text" class="form-control" id="adminname" name="fname" placeholder="First Name" value="{{ old('fname') }}" >
-      <span class="text-danger">@error('fname')
-        {{ $message }}
-      @enderror</span>
-    </div>
-    <div class="mb-3">
-      <label for="exampleInputEmail1" class="form-label">Last Name</label>
-      <input type="text" class="form-control" id="adminname" name="lname" placeholder="Last Name" value="{{ old('lname') }}" >
-      <span class="text-danger">@error('lname')
-        {{ $message }}
-      @enderror</span>
-    </div>
-    <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Email Address</label>
-        <input type="text" class="form-control" id="email_address" name="email_address" placeholder="Email Address" value="{{ old('email_address') }}">
-        <span class="text-danger">@error('email_address')
-          {{ $message }}
-        @enderror</span>
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Password</label>
-        <input type="password" class="form-control" id="admin_password" name="password" placeholder="Password" > 
-        <span class="text-danger">@error('password')
-          {{ $message }}
-        @enderror</span>       
-      </div>  
-    
-    <button type="submit" class="btn btn-primary">Submit</button>
-  </form>
+<div class="row my-5">
+  <div class="col-md-12 mb-5"><h1>Dashboard</h1></div>
+    <div class="col-md-3">
+<div class="card"><div class="card-body">
+      <ul class="list-group list-group-flush">
+        <li class="list-group-item"><i class="fas fa-user"></i> <a href="/myaccount">Dashboard</a></li>
+        <li class="list-group-item"><i class="fas fa-address-card"></i> <a href="/user/ads">My Ads</a></li>
+        <li class="list-group-item"><i class="fas fa-cog"></i> <a href="/profile">Account Info</a></li>
+        <li class="list-group-item"><i class="fas fa-trash-alt"></i> <a href="/user/delete_account">Delete Account</a></li>
+         
+      </ul></div></div>
+ 
 </div>
-<div class="col-md-4"></div>
+<div class="col-md-9">
+  
+   
+  </div>
 </div>
 @endsection
