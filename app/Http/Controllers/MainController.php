@@ -25,7 +25,7 @@ class MainController extends Controller
    {
       $category = Category::all()->where('category_slug', $id)->first();
       $category_id=   $category['id'];      
-      $ads = Ads::where('category_id',$category_id)->get();
+      $ads = Ads::where('category_id',$category_id)->paginate(10);
       return view('ads', ['ads' => $ads]);        
    }
 

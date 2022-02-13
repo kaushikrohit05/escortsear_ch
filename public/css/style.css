@@ -2,6 +2,9 @@ body{ font-size: 18px;}
 @media (min-width: 1200px) {
     .container { width: 1170px; }
   }
+.search{ background-color: #ECECEC;}
+
+.form-select, .form-control, .btn {  border-radius:0px; }
 
 .singup_login_box{ background-color: #000; color:  } 
 .postadd_btn{     background-color: #c11768;

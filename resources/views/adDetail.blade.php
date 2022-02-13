@@ -21,7 +21,7 @@
     
     <div class="row my-5">
     @foreach ($gallery as $image)
-    <div class="col-md-4"><a href="{{ asset('user_images/'.$image['ad_image'] ) }}" data-lightbox="roadtrip"><img src="{{ asset('user_images/'.$image['ad_image'] ) }}" class="img-fluid"></a></div>
+    <div class="col-md-4 mb-3"><a href="{{ asset('user_images/'.$image['ad_image'] ) }}" data-lightbox="roadtrip"><img src="{{ asset('user_images/'.$image['ad_image'] ) }}" class="img-fluid"></a></div>
     @endforeach
 </div>
     

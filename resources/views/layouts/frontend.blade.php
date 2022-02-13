@@ -54,6 +54,37 @@
       </div>
     </div>
   </nav>
+<div class="search py-4">
+  <div class="container"><form action="" method="POST">
+    <div class="row">
+      <div class="col-md-6"><div class="mb-3"><select class="form-select" aria-label="Default select" name="category">
+        <option value="">Select Category</option>
+         
+      </select></div></div>
+      <div class="col-md-6"><div class="mb-3"><input type="text" class="form-control" aria-label="Default select" name="keyword" placeholder="Search Here..." />
+       
+         
+       </div></div>
+    </div>
+    <div class="row">
+      <div class="col-md-6"><div><select class="form-select" aria-label="Default select" name="category">
+        <option value="">All Regions</option>
+         
+      </select></div></div>
+      <div class="col-md-4"><div><select class="form-select" aria-label="Default select" name="category">
+        <option value="">All Locations</option>
+         
+      </select></div></div>
+      <div class="col-md-2"><div class="d-grid">
+        <button class="btn btn-primary" type="submit">Submit</button>
+        
+      </div> </div>
+    </div>
+    </form>
+  </div>
+</div>
+
+
     <div class="container">
         @yield('content')
     </div>
