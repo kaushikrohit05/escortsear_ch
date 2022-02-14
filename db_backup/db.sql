@@ -1,22 +1,4 @@
-/*
-SQLyog Enterprise - MySQL GUI v5.29
-Host - 5.5.5-10.4.21-MariaDB : Database - huntdir
-*********************************************************************
-Server version : 5.5.5-10.4.21-MariaDB
-*/
-
-/*!40101 SET NAMES utf8 */;
-
-/*!40101 SET SQL_MODE=''*/;
-
-create database if not exists `huntdir`;
-
-USE `huntdir`;
-
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-
-/*Table structure for table `failed_jobs` */
+ 
 
 DROP TABLE IF EXISTS `failed_jobs`;
 
