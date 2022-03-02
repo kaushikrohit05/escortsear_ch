@@ -42,7 +42,7 @@
             </ul>
           </li>
           <li class="nav-item">
-            <a class="nav-link " aria-current="page" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout</a>
+            <a class="nav-link active" aria-current="page" href="{{ route('logout') }}"><i class="fas fa-sign-out-alt"></i> Logout </a>
           </li>
           @endif
           <li class="nav-item">
@@ -52,42 +52,6 @@
       </div>
     </div>
   </nav>
-<div class="search pt-3">
-  <div class="container"><form action="" method="POST">
-    <div class="row">
-      <div class="col-md-6"><div class="mb-3"><select class="form-select" aria-label="Default select" name="category">
-        <option value="">Select Category</option>
-        @foreach ($search_categories as $category ) 
-        <option value="{{ $category->id }}">{{ $category->category }}</option>
-        @endforeach 
-      </select></div></div>
-      <div class="col-md-6"><div class="mb-3"><input type="text" class="form-control" aria-label="Default select" name="keyword" placeholder="Search Here..." />
-       
-         
-       </div></div>
-    </div>
-    <div class="row">
-      <div class="col-md-6"><div class="mb-3"><select class="form-select" aria-label="Default select" name="region"  id="region" >
-        <option value="">All Regions</option>
-        @foreach ($search_locations as $location ) 
-        <option value="{{ $location->id }}">{{ $location->location }}</option>
-        @endforeach 
-         
-      </select></div></div>
-      <div class="col-md-4"><div class="mb-3"><select class="form-select" aria-label="Default select" name="location" id="location">
-        <option value="">All Locations</option>
-        @foreach ($search_child_locations as $child_location ) 
-        <option value="{{ $child_location->id }}">{{ $child_location->location }}</option>
-        @endforeach 
-      </select></div></div>
-      <div class="col-md-2"><div  class="mb-3">
-        <button class="btn btn-primary" type="submit">Submit</button>
-        
-      </div> </div>
-    </div>
-    </form>
-  </div>
-</div>
 
 
     <div class="container">
@@ -100,7 +64,7 @@
           <div class="row">
               <div class="col my-3 text-center">
                    
-      <a href="/page/terms-and-conditions" class="clickable">Terms and Conditions</a> | <a href="/page/privacy-policy" class="clickable">Privacy Policy</a> | <a href="/page/contacts-us" class="clickable">Contacts Us</a>
+      <a data-href="/terms-and-conditions" class="clickable">Terms and Conditions</a> | <a data-href="/privacy-policy" class="clickable">Privacy Policy</a> | <a data-href="/contacts-us" class="clickable">Contacts Us</a>
                  
               </div>
           </div>

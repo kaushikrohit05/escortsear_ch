@@ -13,7 +13,7 @@ class Location extends Model
 
     public function children()
     {
-        return $this->hasMany(Location::class, 'parent');
+        return $this->hasMany(Location::class, 'parent')->orderby('sort_id');
 
     }
 

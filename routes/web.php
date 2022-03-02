@@ -23,12 +23,25 @@ Route::get('/',[MainController::class,'index']);
 Route::get('/category/{id}',[MainController::class,'category']);
 Route::get('/ad/{id}',[MainController::class,'ad_detail']);
 
+///////////////PAGES////////////
+Route::get('/page/{id}',[MainController::class,'pages']);
+Route::get('/404',[MainController::class,'notfound']);
+
+
 
 Route::get('/postadd',[MainController::class,'postadd']); 
 Route::get('/adgallery/{id}',[MainController::class,'adgallery']);
 Route::post('/savegallery/{id}',[MainController::class,'savegallery']);
 Route::get('/postsuccess/',[MainController::class,'postsuccess']);
 
+Route::get('/user/editad/{id}',[MainController::class,'editadd']);
+Route::post('/user/updatead/{id}',[MainController::class,'update_user_ad']);
+
+Route::get('/user/editgallery/{id}',[MainController::class,'editgallery']);
+Route::get('/user/deleteadimage/{aid}/{id}',[MainController::class,'deleteadimage']);
+
+
+ 
 
 Route::post('/registeraction',[MainController::class,'register_action']); 
 Route::post('/loginaction',[MainController::class,'login_action'])->name('loginaction');
@@ -43,8 +56,12 @@ Route::post('/saveadwithuser',[MainController::class,'new_user_new_ad']);
 Route::group(['middleware'=>['UserCheck']], function(){
 
     Route::get('/myaccount',[MainController::class,'myaccount']);
-    Route::get('/profile',[MainController::class,'profile']);
+    Route::get('/user/profile',[MainController::class,'profile']);
     Route::get('/user/ads',[MainController::class,'user_ads']);
+    Route::get('/user/delete_account',[MainController::class,'delete_account']);
+
+
+    
 }); 
 
 //////////////ADMIN ROUTES //////////////////////////////////////
@@ -81,8 +98,13 @@ Route::group(['middleware'=>['AdminCheck']], function(){
     Route::post('/admin/savecategory',[CategoriesController::class,'save_category'])->name('savecategory');
     Route::get('/admin/editcategory/{id}',[CategoriesController::class,'edit_category'])->name('editcategory');
     Route::post('/admin/updatecategory/{id}',[CategoriesController::class,'update_category']);
-    Route::get('/admin/deletecategory/{id}',[CategoriesController::class,'delete_category'])->name('deletecategory');    
-    Route::get('/admin/sortcategory/{id}/{value}',[CategoriesController::class,'sort_category'])->name('sortcategory');
+    Route::get('/admin/deletecategory/{id}',[CategoriesController::class,'delete_category'])->name('deletecategory');  
+    
+    //// AJAX REQUEST ////
+    Route::get('/admin/sortcategory/{id}/{value}',[CategoriesController::class,'sort_category']);
+    Route::get('/admin/sortlocation/{id}/{value}',[LocationController::class,'sortlocation']);
+    Route::get('/admin/featured_location/{id}/{value}',[LocationController::class,'featured_location']);
+    //// END AJAX REQUEST ////
 
     Route::get('/admin/locations',[LocationController::class,'index'])->name('locations');
     Route::get('/admin/addlocation',[LocationController::class,'add_location'])->name('addlocation');

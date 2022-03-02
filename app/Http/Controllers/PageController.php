@@ -12,7 +12,6 @@ class PageController extends Controller
     {
          $pages = Page::paginate(10);
          return view('admin/pages', ['pages' => $pages]);
-
     }
     public function add_page ()
     {

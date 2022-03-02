@@ -11,7 +11,7 @@
                 <th width="100">Image</th>
                 <th scope="col">Category</th>
                 <th scope="col">Slug</th>                
-                <th width="100">sort</th>
+                <th width="100">Sort</th>
                 <th scope="col">Status</th>
                 <th scope="col">Date</th>
                 <th scope="col"></th>

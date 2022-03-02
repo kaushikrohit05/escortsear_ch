@@ -1,6 +1,7 @@
-@extends('layouts/frontend')
+@extends('layouts/frontend1')
 
 @section('content')
+ 
  
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.8.2/css/lightbox.min.css">
 <div class="row my-3 breadcrumb"><div class="col small"><a href="/"><i class="fas fa-home"></i></a> > 
@@ -29,7 +30,7 @@
 <div class="col-md-3">
     <div class="d-grid gap-3 mt-5">
         <a href="http://tel:" class="btn btn-primary"><i class="fas fa-phone-alt"></i> TELEPHONE</a>
-        <a class="btn btn-primary" href="#" role="button"><i class="fab fa-whatsapp"></i> WHATSAPP</a>
+        <a class="btn btn-success" href="#" role="button"><i class="fab fa-whatsapp"></i> WHATSAPP</a>
         <a class="btn btn-light" href="#" role="button">REPORT</a>
       </div>   
     

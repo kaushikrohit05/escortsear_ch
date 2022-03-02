@@ -1,4 +1,4 @@
-@extends('layouts/frontend')
+@extends('layouts/frontend1')
 
 @section('content')
 <div class="row my-3 py-3 singup_login_box"  >

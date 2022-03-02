@@ -22,7 +22,7 @@
         <select class="form-select" aria-label="Default select" name="category">
             <option value="">Select Category</option>
             @foreach ($categories as $category)
-            <option value="{{ $category->id }}" {{$ad->category == $category->id  ? 'selected' : ''}}>{{ $category->category }}</option>
+            <option value="{{ $category->id }}" {{$ad->category_id == $category->id  ? 'selected' : ''}}>{{ $category->category }}</option>
             @endforeach
           </select>
         <span class="text-danger">@error('category')
@@ -34,7 +34,7 @@
         <select class="form-select" aria-label="Default select" name="region" id="region" >
             <option value="">Select Region</option>
             @foreach ($locations as $location)
-            <option value="{{ $location->id }}"  {{$ad->region == $location->id  ? 'selected' : ''}}>{{ $location->location }}</option>
+            <option value="{{ $location->id }}"  {{$ad->region_id == $location->id  ? 'selected' : ''}}>{{ $location->location }}</option>
             @endforeach
           </select>
         <span class="text-danger">@error('region')
@@ -45,6 +45,9 @@
         <label for="exampleInputEmail1" class="form-label">Location</label>
         <select class="form-select" aria-label="Default select" name="location" id="location">
              <option value="">Select Location</option>
+             @foreach ($child_locations as $child_location )
+             <option value="{{ $child_location->id }}"  {{$ad->location_id == $location->id  ? 'selected' : ''}}>{{ $child_location->location }}</option>
+             @endforeach
           </select>
         <span class="text-danger">@error('location')
           {{ $message }}

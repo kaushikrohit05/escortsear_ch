@@ -8,7 +8,7 @@
     <div class="mb-3">
       <label for="exampleInputEmail1" class="form-label">Parent</label>
       <select class="form-select" aria-label="Default select" name="parent_location">
-          <option value="0">Top</option>
+          <option value="">Top</option>
           @foreach ($locations as $location)
           <option value="{{ $location->id }}">{{ $location->location }}</option>
           @endforeach

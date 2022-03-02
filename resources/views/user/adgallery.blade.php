@@ -1,4 +1,4 @@
-@extends('layouts/frontend')
+@extends('layouts/frontend1')
 
 @section('content')
 <style>
@@ -55,7 +55,7 @@ form button:active{
      <b>Thank You</b></div>
 </div>
 
-{{ $adid }}
+ 
 <div class="card my-3">
   <div class="card-body">
     <div class="row">

@@ -10,14 +10,18 @@
     @if ($categories)  
     @foreach ($categories as $category ) 
          
-    <div class="col-md-4 text-center">
+    <div class="col-md-4">
         
         <div class="card" >
             <img src="{{ asset('uploads/'.$category['category_image'] ) }}" class="card-img-top" alt="{{ $category['category'] }}">
-            <a href="/category/{{ $category['category_slug'] }}"><h5 class="card-title">{{ $category['category'] }}</h5></a><div class="card-body">
+            <a href="/category/{{ $category['category_slug'] }}"><h5 class="card-title  text-center">{{ $category['category'] }}</h5></a><div class="card-body">
+              <p class="card-text">{{ $category['category_small_description'] }}</p>
+              <ul>@foreach ($featured_locations as $featured_location)
+                <li><a href="/{{ $category['category_slug'] }}/{{ $featured_location->location_slug }}">{{ $featured_location->location }} {{ $category['category'] }}</a></li>
+              @endforeach</ul>
                 
-              <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-              <a href="#" class="btn btn-primary">Go somewhere</a>
+              
+               
             </div>
           </div>
         

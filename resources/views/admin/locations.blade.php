@@ -12,7 +12,9 @@
                 <th scope="col">Parent</th>
                 <th scope="col">Location</th>
                 <th scope="col">Slug</th>
-                <th scope="col">Staus</th>
+                <th  width="100">Sort</th>
+                <th  width="100">Featured</th>
+                <th scope="col">Status</th>
                 <th scope="col"></th>
               </tr>
             </thead>
@@ -23,16 +25,29 @@
                 <td>{{ $row['parent'] }}</td>
                 <td>{{ $row['location'] }}</td>
                 <td>{{ $row['location_slug'] }}</td>
-                <td></td>
+                <td><input class="form-control form-control-sm location_sort" type="number" min="0" name="sort_id" id="" location_id='{{ $row['id'] }}' value="{{ $row['sort_id'] }}"></td>
+                <td><input class="form-check-input location_featured" type="checkbox" name=""  location_id='{{ $row['id'] }}'  value="{{ $row['featured'] }}" 
+                  @if ($row['featured']==1)
+                  checked
+                @endif 
+                ></td>
+                <td>{{ $row['published'] }}</td>
                 <td><a href="editlocation/{{ $row['id'] }}">Edit</a> | <a href="deletelocation/{{ $row['id'] }}">Delete</a></td>
               </tr>
               @foreach ($row->children as $child )
               <tr>
                 <th scope="row">{{ $child['id'] }}</th>
                 <td>{{ $child['parent'] }}</td>
-                <td>{{ $child['location'] }}</td>
+                <td> -> {{ $child['location'] }}</td>
                 <td>{{ $child['location_slug'] }}</td>
-                <td></td>
+                <td><input class="form-control form-control-sm location_sort" type="number" min="0" name="sort_id" id="" location_id='{{ $child['id'] }}' value="{{ $child['sort_id'] }}"></td>
+                <td><input class="form-check-input location_featured" type="checkbox" name=""  location_id='{{ $child['id'] }}' value="{{ $child['featured'] }}"
+                  @if ($child['featured']==1)
+                    checked
+                  @endif
+                  
+                  ></td>
+                <td>{{ $child['published'] }}</td>
                 <td><a href="editlocation/{{ $child['id'] }}">Edit</a> | <a href="deletelocation/{{ $child['id'] }}">Delete</a></td>
               </tr>
               @endforeach 

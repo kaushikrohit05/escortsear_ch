@@ -1,4 +1,4 @@
-@extends('layouts/frontend')
+@extends('layouts/frontend1')
 
 @section('content')
 <h1 class="text-center  my-5">Publish for free in just a few steps!</h1>
