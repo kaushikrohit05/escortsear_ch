@@ -1,14 +1,18 @@
- $(document).ready(function(){
+ $(document).ready(function()
+ {
 
   $("#region").change(function()
   {
+     
     parentid=$(this).val();
     $.get("/admin/getlocations/"+parentid, function(data, status)
     {
         $('#location').empty();
         if(data.length>0)
         {
-            $.each( data, function( key, value )
+           
+          $("#location").append('<option>All Locations</option>');
+          $.each( data, function( key, value )
             {
                 $("#location").append('<option value='+value['id']+'>'+value['location']+'</option>');
             });

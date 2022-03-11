@@ -17,7 +17,7 @@
             <a href="/category/{{ $category['category_slug'] }}"><h5 class="card-title  text-center">{{ $category['category'] }}</h5></a><div class="card-body">
               <p class="card-text">{{ $category['category_small_description'] }}</p>
               <ul>@foreach ($featured_locations as $featured_location)
-                <li><a href="/{{ $category['category_slug'] }}/{{ $featured_location->location_slug }}">{{ $featured_location->location }} {{ $category['category'] }}</a></li>
+                <li><a href="/category/{{ $category['category_slug'] }}/{{ $featured_location->location_slug }}">{{ $featured_location->location }} {{ $category['category'] }}</a></li>
               @endforeach</ul>
                 
               

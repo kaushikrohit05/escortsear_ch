@@ -53,10 +53,12 @@
     </div>
   </nav>
 <div class="search pt-3">
-  <div class="container"><form action="" method="POST">
+  <div class="container">
+    <form action="/search" method="POST" >
+      @csrf
     <div class="row">
       <div class="col-md-6"><div class="mb-3"><select class="form-select" aria-label="Default select" name="category">
-        <option value="">Select Category</option>
+         
         @foreach ($search_categories as $category ) 
         <option value="{{ $category->id }}">{{ $category->category }}</option>
         @endforeach 
@@ -68,14 +70,14 @@
     </div>
     <div class="row">
       <div class="col-md-6"><div class="mb-3"><select class="form-select" aria-label="Default select" name="region"  id="region" >
-        <option value="">All Regions</option>
+        <option value="0">All Regions</option>
         @foreach ($search_locations as $location ) 
         <option value="{{ $location->id }}">{{ $location->location }}</option>
         @endforeach 
          
       </select></div></div>
       <div class="col-md-4"><div class="mb-3"><select class="form-select" aria-label="Default select" name="location" id="location">
-        <option value="">All Locations</option>
+        <option value="0">All Locations</option>
         @foreach ($search_child_locations as $child_location ) 
         <option value="{{ $child_location->id }}">{{ $child_location->location }}</option>
         @endforeach 

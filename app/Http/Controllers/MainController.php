@@ -11,6 +11,7 @@ use App\Models\Category;
 use App\Models\Ads;
 use App\Models\Location;
 use App\Models\Gallery;
+use App\Models\Page;
  
 
 class MainController extends Controller
@@ -26,16 +27,26 @@ class MainController extends Controller
 
    }
 
-   public function pages($page)
+   public function pages($page=null)
    {
-       return $page;
-        if($page=='')
+        $category = Category::orderby('sort_id')->get();      
+        $location = Location::whereNull('parent')->orderby('sort_id')->get();
+        $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();      
+        if($page!='')   
         {
-
+            $page_data = Page::where('page_slug','=',$page)->first();
+            if(!$page_data)   
+            {
+                return redirect('404');
+            }
+            else
+            {
+                return view('pages', ['page'=>$page,'search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);
+            }
         }   
         else
         {
-            return redirect('404');
+            return view('404');
 
         }         
    }
@@ -50,15 +61,154 @@ class MainController extends Controller
 
    public function category($id)
    {
-        $all_category = Category::orderby('sort_id')->get();      
-        $location = Location::whereNull('parent')->orderby('sort_id')->get();
-        $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
+        $all_category       = Category::orderby('sort_id')->get();      
+        $location           = Location::whereNull('parent')->orderby('sort_id')->get();
+        $child_locations    = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
     
-        $category = Category::all()->where('category_slug', $id)->first();
-        $category_id=   $category['id'];      
-        $ads = Ads::where('category_id',$category_id)->paginate(10);
-        return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);          
+        $category           = Category::all()->where('category_slug', $id)->first();
+        $category_id        = $category['id'];     
+
+       
+
+
+        $ads = Ads::where('tbluserads.category_id',$category_id)
+        ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+        ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+        ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
+        ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
+        ->paginate(10); 
+ 
+        return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $location, 'search_child_locations' => $child_locations, 's_category' => $category, 's_location' => '' ]);          
    }
+
+
+
+
+
+   public function category_location($category, $location)
+   {
+        $all_category = Category::orderby('sort_id')->get();      
+        $all_location = Location::whereNull('parent')->orderby('sort_id')->get();
+        $all_child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
+
+        $category = Category::where('category_slug', $category)->first();
+        $location = Location::where('location_slug', $location)->first();
+        
+        $category_id        =   $category['id']; 
+        $location_id        =   $location['id'];  
+        $location_parent    =   $location['parent']; 
+
+       // $category   = Category::where('id', $category)->value('category_slug');
+        //$location   = Location::where('id', $location)->value('location_slug');
+
+        if($location_parent==null)
+        {
+            $ads = Ads::where('category_id',$category_id)
+            ->Where('region_id',$location_id)
+            ->paginate(10);
+
+            $ads = Ads::where('tbluserads.category_id',$category_id)
+            ->Where('region_id',$location_id)
+            ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+            ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+            ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
+            ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
+            ->paginate(10); 
+
+
+        }
+        else
+        {
+            $ads = Ads::where('category_id',$category_id)
+            ->where('location_id',$location_id)
+            ->paginate(10);
+
+            $ads = Ads::where('tbluserads.category_id',$category_id)
+            ->where('location_id',$location_id)
+            ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+            ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+            ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
+            ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
+            ->paginate(10); 
+
+        }
+       
+
+        return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $all_location, 'search_child_locations' => $all_child_locations, 's_category' => $category, 's_location' => $location  ]);          
+
+   }
+
+
+
+   public function getgallery($adid)
+   {
+        $Gallery = Gallery::where('adid','=',$adid)->get(); 
+        return $Gallery;  
+   }
+
+
+    public function search_ads(Request $request )
+    {
+        $all_category = Category::orderby('sort_id')->get();      
+        $all_location = Location::whereNull('parent')->orderby('sort_id')->get();
+        $all_child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
+        
+        // return $request->all();
+        $category=$request->category; 
+        $keyword=$request->keyword; 
+        $region=$request->region; 
+        $location=$request->location; 
+
+        $category   = Category::where('id', $category)->value('category_slug');
+        $location   = Location::where('id', $location)->value('location_slug');
+        $region     = Location::where('id', $region)->value('location_slug');
+
+        
+ 
+
+        /* $ads = Ads::where('category_id',$category)
+        ->where('region_id',$region)
+        ->where('location_id',$location)
+        ->paginate(10);
+        */
+
+        if(!$location && !$region)
+        {
+            return redirect('/category/'.$category);
+        }
+        elseif($region!=0 && $location !=0 )
+        {
+           return redirect('/category/'.$category.'/'.$location);
+        }
+        elseif($region!=0 && $location ==0 )
+        {
+            return redirect('/category/'.$category.'/'.$region);
+        }
+        elseif($region==0 && $location !=0 )
+        {
+            return redirect('/category/'.$category.'/'.$location);
+        }
+
+        
+        /*elseif($location != '0')
+        {
+            
+            
+            //return redirect('/category/'.$category.'/'.$location);
+        }
+        elseif($location == '0')
+        {
+            $location=$region;
+            return($category.' - '.
+        $location.' - '.
+        $region);
+        //return redirect('/category/'.$category.'/'.$location);
+        }*/
+
+
+        //return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $all_location, 'search_child_locations' => $all_child_locations ]);          
+
+    }
 
    public function ad_detail($id)
    {

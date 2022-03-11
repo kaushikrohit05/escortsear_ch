@@ -49,7 +49,16 @@ class LocationController extends Controller
 
     public function getlocations($id = null)
     {
-        $location = Location::where('parent',$id)->get()->toArray();;
+       // return $id;
+        if($id!=0)
+        {
+            $location = Location::where('parent',$id)->get()->toArray();
+        }
+        else
+        {
+            $location = Location::whereNotNull ('parent')->get()->toArray();
+
+        }
         return $location;
     }
 

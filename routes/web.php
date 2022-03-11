@@ -20,11 +20,16 @@ use App\Http\Controllers\UsersController;
 */
 
 Route::get('/',[MainController::class,'index']);
-Route::get('/category/{id}',[MainController::class,'category']);
+Route::get('/category/{id}',[MainController::class,'category'])->name('adsbycategory');
+Route::get('/category/{category}/{location}',[MainController::class,'category_location']);
+Route::post('/search',[MainController::class,'search_ads']);
+
+
 Route::get('/ad/{id}',[MainController::class,'ad_detail']);
 
 ///////////////PAGES////////////
 Route::get('/page/{id}',[MainController::class,'pages']);
+Route::get('/page',[MainController::class,'notfound']);
 Route::get('/404',[MainController::class,'notfound']);
 
 
@@ -123,4 +128,6 @@ Route::group(['middleware'=>['AdminCheck']], function(){
 
  
 });
+
+
 Route::get('/admin/getlocations/{id}',[LocationController::class,'getlocations']);
