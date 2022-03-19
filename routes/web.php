@@ -20,8 +20,8 @@ use App\Http\Controllers\UsersController;
 */
 
 Route::get('/',[MainController::class,'index']);
-Route::get('/category/{id}',[MainController::class,'category'])->name('adsbycategory');
-Route::get('/category/{category}/{location}',[MainController::class,'category_location']);
+Route::get('/{id}',[MainController::class,'category'])->name('adsbycategory');
+Route::get('/{category}/{location}',[MainController::class,'category_location']);
 Route::post('/search',[MainController::class,'search_ads']);
 
 

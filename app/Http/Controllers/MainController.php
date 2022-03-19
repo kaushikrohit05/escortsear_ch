@@ -152,12 +152,19 @@ class MainController extends Controller
         $all_category = Category::orderby('sort_id')->get();      
         $all_location = Location::whereNull('parent')->orderby('sort_id')->get();
         $all_child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
+
+       
         
         // return $request->all();
         $category=$request->category; 
         $keyword=$request->keyword; 
         $region=$request->region; 
         $location=$request->location; 
+
+        $request->session()->put('ses_Category', $category);
+        $request->session()->put('ses_keyword', $keyword);
+        $request->session()->put('ses_region', $region);
+        $request->session()->put('ses_location', $location);
 
         $category   = Category::where('id', $category)->value('category_slug');
         $location   = Location::where('id', $location)->value('location_slug');
@@ -174,19 +181,19 @@ class MainController extends Controller
 
         if(!$location && !$region)
         {
-            return redirect('/category/'.$category);
+            return redirect('/'.$category);
         }
         elseif($region!=0 && $location !=0 )
         {
-           return redirect('/category/'.$category.'/'.$location);
+           return redirect('/'.$category.'/'.$location);
         }
         elseif($region!=0 && $location ==0 )
         {
-            return redirect('/category/'.$category.'/'.$region);
+            return redirect('/'.$category.'/'.$region);
         }
         elseif($region==0 && $location !=0 )
         {
-            return redirect('/category/'.$category.'/'.$location);
+            return redirect('/'.$category.'/'.$location);
         }
 
         
