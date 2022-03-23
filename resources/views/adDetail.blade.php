@@ -5,9 +5,9 @@
  
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.8.2/css/lightbox.min.css">
 <div class="row my-3 breadcrumb"><div class="col small"><a href="/"><i class="fas fa-home"></i></a> > 
-<a href="/{{ $ads['category'] }}">{{ $ads['category'] }}</a> > 
-<a href="/{{ $ads['category'] }}/{{ $ads['region'] }}">{{ $ads['region'] }}</a> > 
-<a href="/{{ $ads['category'] }}/{{ $ads['location'] }}">{{ $ads['location'] }}</a> > </div></div>
+<a href="/category/{{ $ads['category'] }}">{{ $ads['category'] }}</a> > 
+<a href="/category/{{ $ads['category'] }}/{{ $ads['region'] }}">{{ $ads['region'] }}</a> > 
+<a href="/category/{{ $ads['category'] }}/{{ $ads['location'] }}">{{ $ads['location'] }}</a> > </div></div>
 
 <div class="row my-3 backto"><div class="col small"><a href="/"><i class="far fa-arrow-alt-circle-left"></i> Back to search</a>
 <div class="small my-3">{{ $ads['created_at'] }}<br>

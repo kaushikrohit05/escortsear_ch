@@ -4,10 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+ 
+
+use App\Models\Siteuser;
+use App\Models\Category;
+use App\Models\Ads;
+use App\Models\Location;
+use App\Models\Gallery;
 use App\Models\Page;
 
 class PageController extends Controller
 {
+    //////ADMIN////////
+    
     public function index()
     {
          $pages = Page::paginate(10);
@@ -96,6 +105,39 @@ class PageController extends Controller
         $page = Page::find($id);
         $page->delete();
         return redirect('admin/pages');
+    }
+
+    /////////////front/////////////////
+
+    //public function pages($page=null)
+    public function pages($page=null)
+    {
+      
+         $category = Category::orderby('sort_id')->get();      
+         $location = Location::whereNull('parent')->orderby('sort_id')->get();
+         $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();  
+ 
+         if($page!='')   
+         {
+            $page_data = Page::where('page_slug','=','terms-and-conditions')->first();
+             if(!$page_data)   
+             {
+                 return redirect('404');
+             }
+             else
+             {
+                 return view('pages', ['page'=>$page_data,'search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);
+             }
+         }   
+         else
+         {
+             return view('404');
+ 
+         }         
+    }
+    public function notfound()
+    {      
+         return view('404');                
     }
 
 }

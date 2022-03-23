@@ -8,6 +8,7 @@ use App\Http\Controllers\CategoriesController;
 use App\Http\Controllers\LocationController;
 use App\Http\Controllers\AdsController;
 use App\Http\Controllers\UsersController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -20,17 +21,21 @@ use App\Http\Controllers\UsersController;
 */
 
 Route::get('/',[MainController::class,'index']);
-Route::get('/{id}',[MainController::class,'category'])->name('adsbycategory');
-Route::get('/{category}/{location}',[MainController::class,'category_location']);
+//Route::get('/escorts',[CategoriesController::class,'category_escorts']);
+//Route::get('/male-escorts',[CategoriesController::class,'category_male_escorts']);
+//Route::get('/massage',[CategoriesController::class,'category_massage']);
+
+
+
 Route::post('/search',[MainController::class,'search_ads']);
 
 
-Route::get('/ad/{id}',[MainController::class,'ad_detail']);
+//Route::get('/ad/{id}',[MainController::class,'ad_detail']);
 
 ///////////////PAGES////////////
-Route::get('/page/{id}',[MainController::class,'pages']);
-Route::get('/page',[MainController::class,'notfound']);
-Route::get('/404',[MainController::class,'notfound']);
+Route::get('/page/terms-and-conditions',[PageController::class,'pages']);
+Route::get('/page',[PageController::class,'notfound']);
+Route::get('/404',[PageController::class,'notfound']);
 
 
 
@@ -129,5 +134,13 @@ Route::group(['middleware'=>['AdminCheck']], function(){
  
 });
 
-
+////// AJAX //////////
 Route::get('/admin/getlocations/{id}',[LocationController::class,'getlocations']);
+
+Route::get('send-mail',[MainController::class,'sendmail']);
+
+Route::get('{category}',[MainController::class,'category'])->name('adsbycategory');
+Route::get('{category}/{location}',[MainController::class,'category_location']);
+Route::get('{category}/{location}/{ad}',[MainController::class,'ad_detail_new']);
+ 
+  

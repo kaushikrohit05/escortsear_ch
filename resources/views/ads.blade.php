@@ -11,6 +11,7 @@
     @php ($i = 0)
                
     @foreach ($ads as $ad)
+     
     @php ($i++)  
      
         <div class="row">
@@ -50,9 +51,10 @@
 
                         
                       </div>
-                      <div class="col-sm-10"><h3><a href="/ad/{{ $ad['id'] }}">{{ $ad['title'] }}</a></h3>
+                      <div class="col-sm-10"><!--<h3><a href="/ad/{{ $ad['id'] }}">{{ $ad['title'] }}</a></h3>-->
+                        <h3><a href="/{{ $ad['category_slug'] }}/{{ $ad['location_slug'] }}/{{ $ad['title_slug'] }}">{{ $ad['title'] }}</a></h3>
                         <div>{{ Str::limit($ad['description'], 120) }}</div>
-                        <div class="small my-3">24 YEARS | {{ $ad->category }} | {{ $ad['region'] }} | {{ $ad['region'] }}</div></div>
+                        <div class="small my-3">24 YEARS | {{ $ad->category }} | {{ $ad['region'] }} | {{ $ad['location'] }}</div></div>
                     </div>  
                  
                 

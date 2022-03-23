@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\WelcomeMail;
+
 
 use App\Models\Siteuser;
 use App\Models\Category;
@@ -21,43 +24,23 @@ class MainController extends Controller
         $category = Category::orderby('sort_id')->get();      
         $location = Location::whereNull('parent')->orderby('sort_id')->get();
         $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();  
-        $featured_locations = Location::where('featured',1)->orderby('sort_id')->get();  
+        $featured_locations = Location::where('featured',1)->orderby('sort_id')->get(); 
+
+        session()->pull('ses_Category');
+        session()->pull('ses_keyword');
+        session()->pull('ses_region');
+        session()->pull('ses_location');
 
         return view('index', ['categories' => $category, 'featured_locations' => $featured_locations,'search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);   
 
    }
 
-   public function pages($page=null)
-   {
-        $category = Category::orderby('sort_id')->get();      
-        $location = Location::whereNull('parent')->orderby('sort_id')->get();
-        $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();      
-        if($page!='')   
-        {
-            $page_data = Page::where('page_slug','=',$page)->first();
-            if(!$page_data)   
-            {
-                return redirect('404');
-            }
-            else
-            {
-                return view('pages', ['page'=>$page,'search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);
-            }
-        }   
-        else
-        {
-            return view('404');
 
-        }         
-   }
-   public function notfound()
-   {
-      
-        return view('404');
 
-                
-   }
- 
+
+
+  
+ /////////////// ADS LIST //////////////////////////
 
    public function category($id)
    {
@@ -75,7 +58,7 @@ class MainController extends Controller
         ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
         ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
         ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
-        ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
+        ->select('tbluserads.*','cat.category','cat.category_slug','loc.location as region','loc1.location as location','loc1.location_slug as location_slug')        
         ->paginate(10); 
  
         return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $location, 'search_child_locations' => $child_locations, 's_category' => $category, 's_location' => '' ]);          
@@ -155,7 +138,7 @@ class MainController extends Controller
 
        
         
-        // return $request->all();
+       // return $request->all();
         $category=$request->category; 
         $keyword=$request->keyword; 
         $region=$request->region; 
@@ -196,35 +179,20 @@ class MainController extends Controller
             return redirect('/'.$category.'/'.$location);
         }
 
-        
-        /*elseif($location != '0')
-        {
-            
-            
-            //return redirect('/category/'.$category.'/'.$location);
-        }
-        elseif($location == '0')
-        {
-            $location=$region;
-            return($category.' - '.
-        $location.' - '.
-        $region);
-        //return redirect('/category/'.$category.'/'.$location);
-        }*/
-
-
-        //return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $all_location, 'search_child_locations' => $all_child_locations ]);          
-
     }
+
+
+/////////////// ADS Detail //////////////////////////
 
    public function ad_detail($id)
    {
        
-       $addata = Ads::where('tbluserads.id',$id)
+    //return($id);   
+    $addata = Ads::where('tbluserads.id',$id)
         ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
         ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
         ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id') 
-        ->select('tbluserads.id','tbluserads.title','tbluserads.description','tbluserads.created_at','cat.category','loc.location as region','loc1.location as location')        
+        ->select('tbluserads.id','tbluserads.title','tbluserads.description','tbluserads.created_at','cat.category' ,'loc.location as region','loc1.location as location')        
         ->first();
  
         $gallery = Gallery::all()->where('adid', $id);
@@ -232,8 +200,25 @@ class MainController extends Controller
 
         return view('adDetail', ['ads' => $addata, 'gallery'=>$gallery]);
    }
+   public function ad_detail_new($category, $location, $ad)
+   {
+       
+    //return($id);   
+    $addata = Ads::where('tbluserads.title_slug',$ad)
+        ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+        ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+        ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id') 
+        ->select('tbluserads.id','tbluserads.title','tbluserads.description','tbluserads.created_at','cat.category' ,'loc.location as region','loc1.location as location')        
+        ->first();
+ 
+        $gallery = Gallery::all()->where('adid', $addata->id);
 
 
+        return view('adDetail', ['ads' => $addata, 'gallery'=>$gallery]);
+   }
+   
+
+///////////////////////////////////////////////////////////////
     
    public function signup()
    {
@@ -271,7 +256,13 @@ class MainController extends Controller
 
       if($save)
       {         
-         return redirect('/login')->with('success','New User has been successfuly added to database');
+       // Mail::send(''); 
+        
+        
+        
+        return redirect('/login')->with('success','New User has been successfuly added to database');
+
+
       }
       else
       {
@@ -403,12 +394,15 @@ class MainController extends Controller
                         ->withInput();
         }
 
+        $ad_slug=strtolower(preg_replace('/[^a-zA-Z0-9-_\.]/','-', $request->ad_title));
+
         $Ads                            =   new Ads;
         $Ads->userid                    =   $SiteUser; 
         $Ads->category_id               =   $request->category; 
         $Ads->region_id                 =   $request->region;          
         $Ads->location_id               =   $request->location; 
         $Ads->title                     =   $request->ad_title; 
+        $Ads->title_slug                =   preg_replace('/-+/', '-', $ad_slug);
         $Ads->description               =   $request->ad_desc;
         $Ads->email                     =   $request->email_address;
         $Ads->phone                     =   $request->phone_number;
@@ -482,6 +476,7 @@ class MainController extends Controller
             $Ads->region_id                 =   $request->region;          
             $Ads->location_id               =   $request->location; 
             $Ads->title                     =   $request->ad_title;
+            $Ads->title_slug                =   strtolower(preg_replace('/[^a-zA-Z0-9-_\.]/','-', $request->ad_title));
             $Ads->email                     =   $request->email_address;
             $Ads->phone                     =   $request->phone_number;
             $Ads->zip_code                  =   $request->zip;
@@ -628,10 +623,26 @@ class MainController extends Controller
     }
 
     
+    public function sendmail()
+    {
+        $student_detail = [
+            'first_name' => 'test',
+            'last_name' => 'xyz',
+            'address' => 'test xyz'
+        ];
+        //Mail::to('info@softproinc.clom')->send(new WelcomeMail($student_detail));
+        // return new WelcomeMail();
+        // Mail::to('info@softproinc.com')->send(new MyMail($student_detail));
+        //Mail::send('emails.welcome',  $student_detail, function new WelcomeMail($student_detail));
 
+        $data = array('name'=>"Virat Gandhi");
+        Mail::send('emails.welcome', $data, function($message){
+            $message->to('info@softproinc.com', 'Tutorials Point')
+            ->subject('Laravel HTML Testing Mail');
+           // $message->from('info@softproinc.com','Virat Gandhi');
+        });
+        echo "HTML Email Sent. Check your inbox.";
+    }
 
-
-
-
-    
+   
 }

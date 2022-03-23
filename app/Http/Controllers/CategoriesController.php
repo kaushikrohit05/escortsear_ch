@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\Location;
 use App\Models\Category;
+use App\Models\Ads;
 
 class CategoriesController extends Controller
 {
@@ -132,5 +134,63 @@ class CategoriesController extends Controller
         $category->sort_id    =$val;
         $category->save(); 
     }
+
+
+/***************front End  */
+
+public function category_escorts()
+{
+     $all_category       = Category::orderby('sort_id')->get();      
+     $location           = Location::whereNull('parent')->orderby('sort_id')->get();
+     $child_locations    = Location::whereNotNull('parent')->orderby('sort_id')->get();     
+     $category           = Category::all()->where('category_slug', 'escorts')->first();
+     $category_id        = $category['id']; 
+
+     $ads = Ads::where('tbluserads.category_id',$category_id)
+     ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+     ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+     ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
+     ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
+     ->paginate(10); 
+
+     return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $location, 'search_child_locations' => $child_locations, 's_category' => $category, 's_location' => '' ]);          
+}
+
+public function category_male_escorts()
+{
+     $all_category       = Category::orderby('sort_id')->get();      
+     $location           = Location::whereNull('parent')->orderby('sort_id')->get();
+     $child_locations    = Location::whereNotNull('parent')->orderby('sort_id')->get();     
+     $category           = Category::all()->where('category_slug', 'male-escorts')->first();
+     $category_id        = $category['id']; 
+
+     $ads = Ads::where('tbluserads.category_id',$category_id)
+     ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+     ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+     ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
+     ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
+     ->paginate(10); 
+
+     return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $location, 'search_child_locations' => $child_locations, 's_category' => $category, 's_location' => '' ]);          
+}
+
+public function category_massage()
+{
+     $all_category       = Category::orderby('sort_id')->get();      
+     $location           = Location::whereNull('parent')->orderby('sort_id')->get();
+     $child_locations    = Location::whereNotNull('parent')->orderby('sort_id')->get();     
+     $category           = Category::all()->where('category_slug', 'massage')->first();
+     $category_id        = $category['id']; 
+
+     $ads = Ads::where('tbluserads.category_id',$category_id)
+     ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+     ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+     ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
+     ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
+     ->paginate(10); 
+
+     return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $location, 'search_child_locations' => $child_locations, 's_category' => $category, 's_location' => '' ]);          
+}
+
 
 }
