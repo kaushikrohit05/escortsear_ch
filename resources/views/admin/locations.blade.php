@@ -1,8 +1,8 @@
 @extends('layouts/admin')
 
 @section('content')
-{{ $location }}
-<div class="row"><div class="col"><h1>Locations</h1></div><div class="col text-end"><a class="btn btn-primary" href="{{ url('/admin/addlocation') }}" role="button">Add Location</a></div></div>
+ 
+<div class="row"><div class="col"><h1>Locations</h1></div><div class="col text-end"><a class="btn btn-primary" href="{{ url('/admin/addlocation') }}" role="button"><i class="fas fa-plus"></i> Add</a></div></div>
 <div class="row">
     <div class="col-md-12">
         <table class="table table-hover">
@@ -15,7 +15,7 @@
                 <th  width="100">Sort</th>
                 <th  width="100">Featured</th>
                 <th scope="col">Status</th>
-                <th scope="col"></th>
+                <th width="150"></th>
               </tr>
             </thead>
             <tbody>
@@ -31,8 +31,10 @@
                   checked
                 @endif 
                 ></td>
-                <td>{{ $row['published'] }}</td>
-                <td><a href="editlocation/{{ $row['id'] }}">Edit</a> | <a href="deletelocation/{{ $row['id'] }}">Delete</a></td>
+                <td>@if ($row['published']==1)
+                  <i class="fas fa-check-circle"></i>            
+                @endif</td>
+                <td><a href="editlocation/{{ $row['id'] }}"><i class="fas fa-edit"></i> Edit</a> | <a href="deletelocation/{{ $row['id'] }}"><i class="fas fa-trash-alt"></i> Delete</a></td>
               </tr>
               @foreach ($row->children as $child )
               <tr>
@@ -48,14 +50,14 @@
                   
                   ></td>
                 <td>{{ $child['published'] }}</td>
-                <td><a href="editlocation/{{ $child['id'] }}">Edit</a> | <a href="deletelocation/{{ $child['id'] }}">Delete</a></td>
+                <td><a href="editlocation/{{ $child['id'] }}"><i class="fas fa-edit"></i> Edit</a> | <a href="deletelocation/{{ $child['id'] }}"><i class="fas fa-trash-alt"></i> Delete</a></td>
               </tr>
               @endforeach 
 
               @endforeach   
             </tbody>
           </table> 
-          {{ $location->links() }}
+         
            </div> 
 </div>
 @endsection

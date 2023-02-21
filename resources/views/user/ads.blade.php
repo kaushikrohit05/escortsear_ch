@@ -51,7 +51,7 @@
          
         <td><div class="small mb-2">#{{ $row->id }}<br>
           Posted on: {{ $row->created_at }}</div> 
-          <strong>{{ $row->title }}</strong><br>
+          <a href="/{{ $row->category_slug }}/{{ $row->location_slug }}/{{ $row->title_slug }}"><strong>{{ $row->title }}</strong></a><br>
           {{ $row->category }}<br>
           {{ $row->region }} > {{ $row->location }} </td>             
          

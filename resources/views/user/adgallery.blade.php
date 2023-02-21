@@ -60,7 +60,7 @@ form button:active{
   <div class="card-body">
     <div class="row">
   <div class="col" style="position: relative">
-    <form action="/savegallery/{{ $adid }}" method="POST" enctype="multipart/form-data">
+    <form action="/user/savegallery/{{ $adid }}" method="POST" enctype="multipart/form-data">
       @csrf
       <input type="file" name="files[]" placeholder="Choose files" multiple required>
        

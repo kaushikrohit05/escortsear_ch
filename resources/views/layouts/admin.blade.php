@@ -5,8 +5,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://kit.fontawesome.com/378f3e2d81.js" crossorigin="anonymous"></script>
+    <link rel="canonical" href="{{ url(Request::url()) }}" />
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+	<script src="https://cdn.tiny.cloud/1/ud89g26pvdzj62qi0v8wzbfn489krhmeiqppec8zmgwkkhvo/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
     <title>Administrator</title>
   </head>
   <body><nav class="navbar navbar-expand-lg navbar-dark bg-dark">
@@ -27,6 +29,9 @@
             <a class="nav-link" href="{{ route('pages') }}">Pages</a>
           </li>
           <li class="nav-item">
+            <a class="nav-link" href="/admin/posts">Blogs</a>
+          </li>
+          <li class="nav-item">
             <a class="nav-link" href="{{ route('users') }}">Users</a>
           </li>
           <li class="nav-item">
@@ -38,6 +43,9 @@
           <li class="nav-item">
             <a class="nav-link" href="{{ route('locations') }}">Locations</a>
           </li>
+           <li class="nav-item">
+            <a class="nav-link" href="{{ route('seodata') }}">SEO Data</a>
+          </li> 
 
          
           

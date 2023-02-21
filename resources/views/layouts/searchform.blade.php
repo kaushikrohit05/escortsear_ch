@@ -1,4 +1,9 @@
-<div class="search pt-3">
+ 
+            <div class="mobile_only search_icon"><i class="fa fa-search" aria-hidden="true"></i></div>
+           
+          
+          
+          <div class="search pt-3">
     <div class="container">
       <form action="/search" method="POST" >
         @csrf
@@ -27,11 +32,11 @@
            
         </select></div></div>
         <div class="col-md-4"><div class="mb-3"><select class="form-select" aria-label="Default select" name="location" id="location">
-          <option value="0">All Locations</option>
+          <option value="0" parentid="0">All Locations</option>
           @foreach ($search_child_locations as $child_location ) 
           <option value="{{ $child_location->id }}" @if (Session('ses_location')==$child_location->id)
             selected
-          @endif >{{ $child_location->location }}</option>
+          @endif  parentid="{{ $child_location->parent }}">{{ $child_location->location }}</option>
           @endforeach 
         </select></div></div>
         <div class="col-md-2"><div  class="mb-3">

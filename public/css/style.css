@@ -2,32 +2,69 @@ body{ font-size: 14px;}
 @media (min-width: 1200px) {
     .container { width: 1170px; }
   }
-.search{ background-color: #ECECEC;}
-
+.search{ background-color: #3B3B3B;} 
+.search .form-select, .search .form-control {  background-color : #565656; color: #fff; border: 1px solid #000;  }
 .form-select, .form-control, .btn {  border-radius:0px; }
-
 .singup_login_box{ background-color: #000; color:  } 
-.postadd_btn{     background-color: #c11768;
-    background-image: linear-gradient(to right,#c11768,#ff007a);
+.postadd_btn{     background-color: #b8262d;
+    background-image: linear-gradient(to right,#b8262d,#b8262d);
     cursor: pointer;
     color: #fff!important;
     font-weight: 700;
     letter-spacing: 1px; 
 padding:10px 30px ;}
 .categories a{ text-decoration:none ; }
-.categories h5.card-title{ background-color: #c11768; color: #fff; margin: 0; padding: 8px  0; text-transform: uppercase;}
-
+.categories h5.card-title{ background-color: #eaa956; color: #fff; margin: 0; padding: 8px  0; text-transform: uppercase;}
 .card { border-radius: 0rem; }
+.disclaimer{ border-top:1px solid #eeeeee; background-color:#F3F3F3;  }
 .footer-section{ border-top:1px solid #eeeeee;  }
 .footer-section a{ color: #000; text-decoration: none;}
-#scrollToTop{ position: fixed; right: 10px; bottom: 10px;}
- 
-.breadcrumb a{ text-decoration: none; color: #c11768; font-size: 14px;}
-.backto a{ text-decoration: none; color: #c11768; font-weight: bold ;  font-size: 14px;}
+#scrollToTop{ position: fixed; right: 10px; bottom: 10px;} 
+.breadcrumb a{ text-decoration: none; color: #BA2258; font-size: 14px;}
+.backto a{ text-decoration: none; color: #BA2258; font-weight: bold ;  font-size: 14px;}
 
 /********** listing page *************/
-.ads_list{}
-.ads_list .card { border: 1px solid #c11768; }
-.ads_list .card h3{ font-size: 20px;   }
-.ads_list .card h3 a{  color:#c11768; text-decoration: none; }
-.categories li a{ color:#c11768; text-decoration: none; }
+ 
+.ads_list .card { border: 1px solid #BA2258; border-radius: 1rem;  }
+.ads_list .ad_card1{ border: 1px solid #BA2258; border-radius: 1rem;  }
+.ads_list .post_title a{  color:#BA2258; text-decoration: none; font-size: 20px; }
+.categories li a{ color:#BA2258; text-decoration: none; }
+.singup_login_box{ background-image: url(/images/loginbg.jpg); min-height: 500px; }
+.singup_login_box .content{ color: #fff;} 
+.btn-primary {color: #fff;background-color: #eaa956 !important;border-color: #eaa956 !important;}
+.ads_page_links a{ display: block; font-weight: bold; text-decoration: none; color: #BA2258;}
+.accordion-button { padding: 0.7rem 1.25rem !important;   font-weight: bold; text-decoration: none; color: #BA2258 !important; }
+.accordion-body a{  text-decoration: none !important; color: #BA2258 !important; }  
+.pagination {    display: flex;    padding-left: 0;    list-style: none;    justify-content: center !important;}
+li.page-item {    display: none;}
+.page-item:first-child,
+.page-item:nth-child( 1 ),
+.page-item:nth-last-child( 1 ),
+.page-item:last-child,
+.page-item.active,
+.page-item.disabled { display: block;}
+a.post_title{ color: #ba2258; text-decoration: none;} 
+.mobile_only{ display:none; }
+.no_mobile{ display:block;} 
+
+.search_icon{ position: absolute; top: 5px;} 
+.ad_card{ border: 1px solid #ba2258; border-radius: 10px; height: 150px; overflow: hidden; }
+.ad_card img{ width: 100%;}
+
+@media  (max-width: 768px) {
+    .no_mobile{ display:none;} 
+    .mobile_only{ display:block; }
+    .search{ display:none;}  
+   
+    .ads_list .post_title a{  font-size: 16px; 
+      height:2.5rem;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:2;
+      -webkit-box-orient:vertical;    } 
+    .ads_list .post_desc {  height:2.5rem;
+      overflow:hidden;
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical; }
+  }

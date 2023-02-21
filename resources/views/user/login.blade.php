@@ -2,14 +2,14 @@
 
 @section('content')
 <div class="row my-3 py-3 singup_login_box"  >
-  <div class="col-md-8 text-center"><h2>NOT SIGNED IN YET?</h2>
+  <div class="col-md-8 text-center"><div class="content py-5"><h2>NOT SIGNED IN YET?</h2>
     Signing in you can<br>
     
     Manage your ads easily<br>
     
     Publish without waiting for the e-mail notification<br><br>
     
-    <a class="btn btn-outline-primary" href="/signup" role="button">SIGN UP HERE</a></div>
+    <a class="btn btn-outline-primary" href="/signup" role="button">SIGN UP HERE</a></div></div>
   <div class="col-md-4">
     
     <div class="card"><div class="cord-body p-4"><h1>Login</h1>

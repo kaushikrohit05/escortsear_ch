@@ -13,7 +13,7 @@ class UsersController extends Controller
 {
     public function index()
     {
-         $users = Siteuser::paginate(10);
+         $users = Siteuser::orderBy('email_address')->paginate(50);
          return view('admin/users', ['users' => $users]);
 
     }
@@ -22,11 +22,19 @@ class UsersController extends Controller
         return view('/admin/add_user');
 
     }
+    public function search_user( Request $request )
+    {
+         $Email_address=$request->Email_address;
+        // die();
+         
+         $users = Siteuser::where('email_address',$Email_address)->paginate(50);
+         return view('admin/users', ['users' => $users]);
+        
+    }
+
     public function save_user( Request $request )
     {
         $validator = Validator::make($request->all(), [
-            'fname' => 'required',
-            'lname' => 'required',
             'email_address' => 'required|email|unique:tbluser,email_address',
             'user_password' => 'required'
         ]);
@@ -39,8 +47,6 @@ class UsersController extends Controller
     
 
         $user                               =   new Siteuser;
-        $user->fname                        =   $request->fname; 
-        $user->lname                        =   $request->lname; 
         $user->email_address                =   $request->email_address; 
         $user->password                     =   Hash::make($request->user_password); 
         $user->isActive                     =   $request->isActive; 
@@ -64,9 +70,7 @@ class UsersController extends Controller
     public function update_user(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'fname' => 'required',
-            'lname' => 'required',
-            'user_password' => 'required'
+           // 'user_password' => 'required'
         ]);
 
         if ($validator->fails()) {
@@ -77,8 +81,6 @@ class UsersController extends Controller
     
 
         $user                               =   Siteuser::find($id);
-        $user->fname                        =   $request->fname; 
-        $user->lname                        =   $request->lname; 
         $user->password                     =   Hash::make($request->user_password); 
         $user->isActive                     =   $request->isActive; 
 

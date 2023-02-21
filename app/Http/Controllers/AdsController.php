@@ -10,6 +10,7 @@ use App\Models\Ads;
 use App\Models\Category;
 use App\Models\Siteuser;
 use App\Models\Location;
+use App\Models\Gallery;
 
 class AdsController extends Controller
 {
@@ -21,13 +22,51 @@ class AdsController extends Controller
         ->join('tbluser as user','user.id', '=', 'ads.userid')
         ->join('tbllocation as loc','loc.id', '=', 'ads.region_id') 
         ->join('tbllocation as loc1','loc1.id', '=', 'ads.location_id') 
-        ->select('ads.id','ads.title','user.fname as user','ads.created_at','cat.category','loc.location as region','loc1.location as location')        
-        ->paginate(10);
-  
-        return view('admin/ads', ['ads' => $ads]);
+        ->select('ads.id','ads.title','user.email_address as user','ads.created_at','cat.category','loc.location as region','loc1.location as location')        
+        ->orderby('ads.id', 'DESC') 
+        ->paginate(100);
+       // return $ads;
+         return view('admin/ads', ['ads' => $ads]);
 
 
     }
+    public function user_ads($id = null)
+    {
+        //return $id;
+        $ads = DB::table('tbluserads as ads')
+        ->join('tblcategory as cat','cat.id', '=', 'ads.category_id')
+        ->join('tbluser as user','user.id', '=', 'ads.userid')
+        ->join('tbllocation as loc','loc.id', '=', 'ads.region_id') 
+        ->join('tbllocation as loc1','loc1.id', '=', 'ads.location_id') 
+        ->select('ads.id','ads.title','user.email_address as user','ads.created_at','cat.category','loc.location as region','loc1.location as location')
+        ->where('user.id',$id)        
+        ->orderby('ads.id', 'DESC') 
+        ->paginate(100);
+  
+        //return $ads;
+         return view('admin/ads', ['ads' => $ads]);
+    }
+
+    public function search_ad(Request $request)
+    {
+         $adid= $request->adid;
+          
+         
+         $ads = DB::table('tbluserads as ads')
+        ->join('tblcategory as cat','cat.id', '=', 'ads.category_id')
+        ->join('tbluser as user','user.id', '=', 'ads.userid')
+        ->join('tbllocation as loc','loc.id', '=', 'ads.region_id') 
+        ->join('tbllocation as loc1','loc1.id', '=', 'ads.location_id') 
+        ->select('ads.id','ads.title','user.email_address as user','ads.created_at','cat.category','loc.location as region','loc1.location as location')
+        ->where('ads.id',$adid) 
+        //->get();       
+        //->orderby('ads.id', 'DESC') 
+         ->paginate(100);
+
+         return view('admin/ads', ['ads' => $ads]);
+
+    }
+
     public function add_ad()
     {
         $categories = Category::all(); 
@@ -39,12 +78,35 @@ class AdsController extends Controller
         return view('/admin/add_ad', ['categories' => $categories, 'users' => $users, 'locations' => $locations ]);
 
     }
+    
 
     public function save_ad(Request $request)
     {
-         //return $request->all();
+         // return $request->all();
          //die();
                 
+         $validator = Validator::make($request->all(), [
+            'user'              => 'required',
+            'category'          => 'required',
+            'region'            => 'required',
+            'location'          => 'required',
+            'zip'               => 'required',
+            'area'              => 'required',
+            'address'           => 'required',
+            'ad_title'          => 'required',
+            'ad_desc'           => 'required',
+            'phone_number'      => 'required',
+            'age'               => 'required',
+        ]);
+
+        if ($validator->fails()) {
+            return redirect('/admin/addad')
+                        ->withErrors($validator)
+                        ->withInput();
+        }
+        
+        /*
+        
         $validator = Validator::make($request->all(), [
             'user' => 'required',
             'category' => 'required',
@@ -60,18 +122,42 @@ class AdsController extends Controller
                         ->withInput();
         }
 
+        */
+
         $Ads                            = new Ads;
         $Ads->userid                    =$request->user; 
-        $Ads->category_id               =$request->category; 
-        $Ads->region_id                 =$request->region;          
-        $Ads->location_id               =$request->location; 
-        $Ads->title                     =$request->ad_title; 
-        $Ads->description               =$request->ad_desc;
-        $Ads->meta_title                =$request->meta_title;
-        $Ads->meta_description          =$request->meta_description;
-        $Ads->isActive                  =$request->isActive; 
+       // $Ads->category_id               =$request->category; 
+       // $Ads->region_id                 =$request->region;          
+       // $Ads->location_id               =$request->location; 
+       // $Ads->title                     =$request->ad_title; 
+       ///// $Ads->description               =$request->ad_desc;
+       // $Ads->isActive                  =$request->isActive; 
+
+        $Ads->category_id               =   $request->category; 
+        $Ads->region_id                 =   $request->region;          
+        $Ads->location_id               =   $request->location; 
+        $Ads->title                     =   $request->ad_title; 
+        $Ads->description               =   $request->ad_desc;
+        $Ads->email                     =   $request->email_address;
+        $Ads->phone                     =   $request->phone_number;
+        $Ads->user_age                  =   $request->age;
+        $Ads->zip_code                  =   $request->zip;
+        $Ads->area                      =   $request->area;
+        $Ads->address                   =   $request->address; 
+        $Ads->whatsapp_active           =   $request->whatsapp; 
+        $Ads->isActive                  =   $request->isActive; 
+
+
 
         $save=$Ads->save();
+
+        $Adsid=$Ads->id;
+
+        $Ads = Ads::find($Adsid);
+        $Ads->title_slug               =   'es22'.$Adsid;
+        $Ads->save();
+
+
         if($save){
             //return back()->with('success','New User has been successfuly added to database');
             return redirect('admin/ads')->with('success','New User has been successfuly added to database');
@@ -85,25 +171,87 @@ class AdsController extends Controller
         $categories = Category::all(); 
         $users = Siteuser::all(); 
         $locations = Location::whereNull('parent')
-         ->with(['children'])
+         //->with(['children'])
          ->get(); 
          
         $Ads = Ads::all()->where('id',$id)->first();
-        return view('admin/edit_ad', ['ad' => $Ads,'categories' => $categories, 'users' => $users, 'locations' => $locations ]);
+        $Adsid=$Ads->id;
+        $region_id=$Ads->region_id;
+
+        $child_locations = Location::where('parent',$region_id)
+        //->with(['children'])
+        ->get();
+
+
+        return view('admin/edit_ad', ['ad' => $Ads,'categories' => $categories, 'users' => $users, 'locations' => $locations,'child_locations'=>$child_locations ]);
     }
-    public function update_ad($id = null)
+    public function update_ad(Request $request,$id)
     {
-        //$category = Category::all()->where('id',$id)->first();
-        //return view('admin/edit_category', ['category' => $category]);
+        
+           // return $request->all();
+           // die();
+         
+          if($request->whatsapp=='on')
+          { 
+              $whatsapp=1; 
+            }
+          else
+          { $whatsapp=0; }
+
+         $Ads = Ads::find($id);
+         $Ads->category_id               =   $request->category; 
+         $Ads->region_id                 =   $request->region;          
+         $Ads->location_id               =   $request->location; 
+         $Ads->title                     =   $request->ad_title; 
+         $Ads->description               =   $request->ad_desc;
+         $Ads->email                     =   $request->email_address;
+         $Ads->phone                     =   $request->phone_number;
+         $Ads->user_age                  =   $request->age;
+         $Ads->zip_code                  =   $request->zip;
+         $Ads->area                      =   $request->area;
+         $Ads->address                   =   $request->address; 
+         $Ads->whatsapp_active           =   $whatsapp; 
+         $Ads->isActive                  =   $request->isActive; 
+ 
+ 
+ 
+         $save=$Ads->save();
+
+         
+        if($save){
+            //return back()->with('success','New User has been successfuly added to database');
+            return redirect('/admin/ads')->with('success','New User has been successfuly added to database');
+
+         }else{
+             return back()->with('fail','Something went wrong, try again later');
+         }
     }
     
     
-    
+    public function adgallery($id = null)
+    {
+        //return $id;
+        // die();
+        // return view('admin/adgallery');
+        //return view('user/adgallery',['Page_name'=>'adgallery', 'adid' => $id,'Page_data'=>'']);
+
+        $Gallery = Gallery::where('adid','=',$id)->get(); 
+        return view('admin/adgallery', ['Gallery' => $Gallery, 'adid' => $id ]);
+    }
 
     public function delete_ad($id = null)
     {
-        $Ads = Ads::find($id);
-        $Ads->delete();
+        Ads::where('id','=',$id)->delete();
+        Gallery::where('adid',$id)->delete();  
+        
+        return redirect('admin/ads');
+    }
+
+    public function delete_ads(Request $request)
+    {
+        $ids = $request->adid;  
+        $deletedRows = Ads::whereIn('id',$ids)->delete(); 
+        $deletedRows = Gallery::whereIn('adid',$ids)->delete(); 
         return redirect('admin/ads');
     }
 }

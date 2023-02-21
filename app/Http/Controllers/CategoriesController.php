@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Location;
 use App\Models\Category;
+use App\Models\Catlocseo;
 use App\Models\Ads;
 
 class CategoriesController extends Controller
@@ -46,6 +47,7 @@ class CategoriesController extends Controller
         $category->category                     =$request->category; 
         $category->category_slug                =strtolower($request->category_slug); 
         $category->category_small_description   =$request->small_desc;
+		$category->category_description   		=$request->long_desc;
 
 
         if($request->hasFile('category_image'))
@@ -59,8 +61,8 @@ class CategoriesController extends Controller
         }
 
           
-        $category->category_title =$request->meta_title; 
-        $category->category_description =$request->meta_description; 
+        $category->meta_title =$request->meta_title; 
+        $category->meta_description =$request->meta_description; 
         $category->isActive =$request->isActive; 
 
         $save=$category->save();
@@ -101,6 +103,7 @@ class CategoriesController extends Controller
         $category->category                     =$request->category; 
         $category->category_slug                =$request->category_slug;
         $category->category_small_description   =$request->small_desc;
+		$category->category_description   		=$request->long_desc;
         
         if($request->hasFile('category_image'))
         {
@@ -112,8 +115,8 @@ class CategoriesController extends Controller
 
         }
 
-        $category->category_title =$request->meta_title; 
-        $category->category_description =$request->meta_description; 
+        $category->meta_title =$request->meta_title; 
+        $category->meta_description =$request->meta_description; 
         $category->isActive =$request->isActive; 
 
         $category->save();
@@ -125,6 +128,10 @@ class CategoriesController extends Controller
     {
         $category = Category::find($id);
         $category->delete();
+
+       // Catlocseo::destroy('category_id',$id);
+        Catlocseo::where('category_id', $id)->delete(); 
+
         return redirect('admin/categories');
     }
 

@@ -6,7 +6,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use File;
 use App\Mail\WelcomeMail;
+use Image;
 
 
 use App\Models\Siteuser;
@@ -15,23 +17,25 @@ use App\Models\Ads;
 use App\Models\Location;
 use App\Models\Gallery;
 use App\Models\Page;
+use App\Models\Catlocseo;
  
 
 class MainController extends Controller
 {
    public function index()
    {
+        $Page_data = Page::all()->where('page_slug', 'home')->first();
         $category = Category::orderby('sort_id')->get();      
-        $location = Location::whereNull('parent')->orderby('sort_id')->get();
-        $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();  
-        $featured_locations = Location::where('featured',1)->orderby('sort_id')->get(); 
+        $location = Location::whereNull('parent')->orderby('location')->get();
+        $child_locations = Location::whereNotNull('parent')->orderby('location')->get();  
+        $featured_locations = Location::where('featured',1)->orderby('location')->get(); 
 
         session()->pull('ses_Category');
         session()->pull('ses_keyword');
         session()->pull('ses_region');
         session()->pull('ses_location');
 
-        return view('index', ['categories' => $category, 'featured_locations' => $featured_locations,'search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);   
+        return view('index', ['Page_name'=>'home','Page_data'=>$Page_data,'categories' => $category, 'featured_locations' => $featured_locations,'search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);   
 
    }
 
@@ -45,23 +49,26 @@ class MainController extends Controller
    public function category($id)
    {
         $all_category       = Category::orderby('sort_id')->get();      
-        $location           = Location::whereNull('parent')->orderby('sort_id')->get();
-        $child_locations    = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
-    
+        $location           = Location::whereNull('parent')->orderby('location')->get();
+        $child_locations    = Location::whereNotNull('parent')->orderby('location')->get();     
         $category           = Category::all()->where('category_slug', $id)->first();
-        $category_id        = $category['id'];     
+        if ($category === null) {
+            return redirect('/404');
+         }
+        $category_id        = $category['id'];
 
-       
-
+        session()->put('ses_Category', $category_id);
 
         $ads = Ads::where('tbluserads.category_id',$category_id)
+        ->where('tbluserads.isActive', 1)
         ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
         ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
         ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
-        ->select('tbluserads.*','cat.category','cat.category_slug','loc.location as region','loc1.location as location','loc1.location_slug as location_slug')        
-        ->paginate(10); 
+        ->select('tbluserads.*','cat.category','cat.category_slug','loc.location as region','loc1.location as location','loc1.location_slug as location_slug')
+        ->orderby('tbluserads.id', 'DESC')       
+        ->paginate(20); 
  
-        return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $location, 'search_child_locations' => $child_locations, 's_category' => $category, 's_location' => '' ]);          
+        return view('ads', ['Page_name'=>'home','Page_data'=>$category, 'ads' => $ads,'search_categories' => $all_category,'search_locations' => $location, 'search_child_locations' => $child_locations, 's_category' => $category, 's_location' => '' ]);          
    }
 
 
@@ -71,15 +78,25 @@ class MainController extends Controller
    public function category_location($category, $location)
    {
         $all_category = Category::orderby('sort_id')->get();      
-        $all_location = Location::whereNull('parent')->orderby('sort_id')->get();
-        $all_child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
+        $all_location = Location::whereNull('parent')->orderby('location')->get();
+        $all_child_locations = Location::whereNotNull('parent')->orderby('location')->get(); 
 
         $category = Category::where('category_slug', $category)->first();
         $location = Location::where('location_slug', $location)->first();
+
+        if (($category === null) || ($location === null)) {
+            return redirect('/404');
+         }
         
         $category_id        =   $category['id']; 
         $location_id        =   $location['id'];  
         $location_parent    =   $location['parent']; 
+
+
+        session()->put('ses_Category', $category_id);
+        //$request->session()->put('ses_region', $region);
+        session()->put('ses_location', $location_id);
+
 
        // $category   = Category::where('id', $category)->value('category_slug');
         //$location   = Location::where('id', $location)->value('location_slug');
@@ -88,15 +105,19 @@ class MainController extends Controller
         {
             $ads = Ads::where('category_id',$category_id)
             ->Where('region_id',$location_id)
-            ->paginate(10);
+            ->paginate(50);
 
             $ads = Ads::where('tbluserads.category_id',$category_id)
             ->Where('region_id',$location_id)
+            ->where('tbluserads.isActive', 1)
             ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
             ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
             ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
-            ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
-            ->paginate(10); 
+            ->select('tbluserads.*','cat.category','cat.category_slug','loc.location as region','loc.location_slug as region_slug','loc1.location as location','loc1.location_slug as location_slug')         
+            ->orderby('tbluserads.id', 'DESC')     
+            ->paginate(20); 
+
+            
 
 
         }
@@ -104,20 +125,24 @@ class MainController extends Controller
         {
             $ads = Ads::where('category_id',$category_id)
             ->where('location_id',$location_id)
-            ->paginate(10);
+            ->paginate(50);
 
             $ads = Ads::where('tbluserads.category_id',$category_id)
             ->where('location_id',$location_id)
+            ->where('tbluserads.isActive', 1)
             ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
             ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
             ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
-            ->select('tbluserads.*','cat.category','loc.location as region','loc1.location as location')        
-            ->paginate(10); 
+            ->select('tbluserads.*','cat.category','cat.category_slug','loc.location as region','loc.location_slug as region_slug','loc1.location as location','loc1.location_slug as location_slug')        
+            ->orderby('tbluserads.id', 'DESC')  
+            ->paginate(20); 
 
         }
        
-
-        return view('ads', ['ads' => $ads,'search_categories' => $all_category,'search_locations' => $all_location, 'search_child_locations' => $all_child_locations, 's_category' => $category, 's_location' => $location  ]);          
+        $catlocseo = Catlocseo::where('category_id',$category_id)
+        ->where('location_id',$location_id)->first();
+        
+        return view('ads', ['Page_name'=>'home','Page_data'=>$catlocseo,'ads' => $ads,'search_categories' => $all_category,'search_locations' => $all_location, 'search_child_locations' => $all_child_locations, 's_category' => $category, 's_location' => $location  ]);          
 
    }
 
@@ -133,8 +158,8 @@ class MainController extends Controller
     public function search_ads(Request $request )
     {
         $all_category = Category::orderby('sort_id')->get();      
-        $all_location = Location::whereNull('parent')->orderby('sort_id')->get();
-        $all_child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
+        $all_location = Location::whereNull('parent')->orderby('location')->get();
+        $all_child_locations = Location::whereNotNull('parent')->orderby('location')->get(); 
 
        
         
@@ -192,29 +217,110 @@ class MainController extends Controller
         ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
         ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
         ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id') 
-        ->select('tbluserads.id','tbluserads.title','tbluserads.description','tbluserads.created_at','cat.category' ,'loc.location as region','loc1.location as location')        
+        ->select('tbluserads.id','tbluserads.isActive','tbluserads.title','tbluserads.title_slug','tbluserads.description','tbluserads.created_at','cat.category' ,'loc.location as region','loc1.location as location')        
         ->first();
  
         $gallery = Gallery::all()->where('adid', $id);
 
 
-        return view('adDetail', ['ads' => $addata, 'gallery'=>$gallery]);
+        return view('adDetail', ['Page_name'=>'home','Page_data'=>'','ads' => $addata, 'gallery'=>$gallery]);
    }
    public function ad_detail_new($category, $location, $ad)
    {
        
     //return($id);   
-    $addata = Ads::where('tbluserads.title_slug',$ad)
+        $addata = Ads::where('tbluserads.title_slug',$ad)
         ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
         ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
         ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id') 
-        ->select('tbluserads.id','tbluserads.title','tbluserads.description','tbluserads.created_at','cat.category' ,'loc.location as region','loc1.location as location')        
+        ->select('tbluserads.id','tbluserads.isActive','tbluserads.user_age','tbluserads.title','tbluserads.title_slug','tbluserads.description','tbluserads.phone','tbluserads.created_at','cat.category', 'cat.category_slug' ,'loc.location as region','loc.location_slug as region_slug','loc1.location as location','loc1.location_slug as location_slug')        
         ->first();
+
+        //return $addata;
+        //die();
+
+        if ($addata == null) {
+
+            //return redirect('/404', ['Page_data'=>'']);
+///////////////////
+$all_category = Category::orderby('sort_id')->get();      
+        $all_location = Location::whereNull('parent')->orderby('location')->get();
+        $all_child_locations = Location::whereNotNull('parent')->orderby('location')->get(); 
+
+        $category = Category::where('category_slug', $category)->first();
+        $location = Location::where('location_slug', $location)->first();
+
+        if (($category === null) || ($location === null)) {
+            return redirect('/404');
+         }
+        
+        $category_id        =   $category['id']; 
+        $location_id        =   $location['id'];  
+        $location_parent    =   $location['parent']; 
+
+
+        session()->put('ses_Category', $category_id);
+        //$request->session()->put('ses_region', $region);
+        session()->put('ses_location', $location_id);
+
+
+       // $category   = Category::where('id', $category)->value('category_slug');
+        //$location   = Location::where('id', $location)->value('location_slug');
+
+        if($location_parent==null)
+        {
+            $ads = Ads::where('category_id',$category_id)
+            ->Where('region_id',$location_id)
+            ->paginate(50);
+
+            $ads = Ads::where('tbluserads.category_id',$category_id)
+            ->Where('region_id',$location_id)
+            ->where('tbluserads.isActive', 1)
+            ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+            ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+            ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
+            ->select('tbluserads.*','cat.category','cat.category_slug','loc.location as region','loc.location_slug as region_slug','loc1.location as location','loc1.location_slug as location_slug')         
+            ->orderby('tbluserads.id', 'DESC')     
+            ->paginate(20); 
+
+            
+
+
+        }
+        else
+        {
+            $ads = Ads::where('category_id',$category_id)
+            ->where('location_id',$location_id)
+            ->paginate(50);
+
+            $ads = Ads::where('tbluserads.category_id',$category_id)
+            ->where('location_id',$location_id)
+            ->where('tbluserads.isActive', 1)
+            ->join('tblcategory as cat','cat.id', '=', 'tbluserads.category_id')
+            ->join('tbllocation as loc','loc.id', '=', 'tbluserads.region_id') 
+            ->join('tbllocation as loc1','loc1.id', '=', 'tbluserads.location_id')         
+            ->select('tbluserads.*','cat.category','cat.category_slug','loc.location as region','loc.location_slug as region_slug','loc1.location as location','loc1.location_slug as location_slug')        
+            ->orderby('tbluserads.id', 'DESC')  
+            ->paginate(20); 
+
+        }
+       
+        $catlocseo = Catlocseo::where('category_id',$category_id)
+        ->where('location_id',$location_id)->first();
+        
+        return view('404ads', ['Page_name'=>'home','Page_data'=>$catlocseo,'ads' => $ads,'search_categories' => $all_category,'search_locations' => $all_location, 'search_child_locations' => $all_child_locations, 's_category' => $category, 's_location' => $location  ]);          
+
+
+
+///////////////////            
+         }
+         else
+         {
+            $gallery = Gallery::all()->where('adid', $addata->id);		 
+            return view('adDetail', ['Page_name'=>'add_detail','Page_data'=>'','ads' => $addata, 'gallery'=>$gallery]);
+         }
  
-        $gallery = Gallery::all()->where('adid', $addata->id);
-
-
-        return view('adDetail', ['ads' => $addata, 'gallery'=>$gallery]);
+        
    }
    
 
@@ -228,7 +334,8 @@ class MainController extends Controller
       }
       else
       {
-         return view('user/signup');
+        $Page_data = Page::all()->where('page_slug', 'signup')->first();
+        return view('user/signup',['Page_name'=>'signup','Page_data'=>$Page_data]);
       }
    }
 
@@ -252,15 +359,24 @@ class MainController extends Controller
       $user                               =   new Siteuser;
       $user->email_address                =   $request->email_address; 
       $user->password                     =   Hash::make($request->password); 
+      $user->isActive                     =   0;
       $save=$user->save();
+      $userid=$user->id;
+
 
       if($save)
       {         
-       // Mail::send(''); 
+       // Mail
         
+        $data = array(
+        'subject' => 'New User registration', 
+        'emailaddress'=> $request->email_address,
+         );
+        Mail::to($request->email_address)->send(new WelcomeMail($data));
+        //return back()->with('success', 'Sent Successfully !');
         
-        
-        return redirect('/login')->with('success','New User has been successfuly added to database');
+       /// Mail end 
+        return redirect('/thankyou');
 
 
       }
@@ -269,6 +385,32 @@ class MainController extends Controller
          return back()->with('fail','Something went wrong, try again later');
       }
    }
+
+   
+   public function registrationthankyou()
+    {
+       
+        return view('user/registrationthankyou',['Page_name'=>'login','Page_data'=>'']);
+           
+    }
+
+
+
+
+   public function verifyaccount($id)
+   {
+        $userinfo   =   Siteuser::where('email_address','=',$id)->first();
+        if(!$userinfo){
+            return redirect('/login')->with('fail','Invalid Request');
+        }else
+        {
+            $userinfo->isActive = 1;
+            $userinfo->save();
+            return redirect('/login')->with('success','Account activated successfuly');
+        }
+        
+   }
+
 
 
     public function login()
@@ -279,7 +421,8 @@ class MainController extends Controller
       }
       else
       {
-         return view('user/login');
+        $Page_data = Page::all()->where('page_slug', 'login')->first();
+        return view('user/login',['Page_name'=>'login','Page_data'=>$Page_data]);
       }     
     }
 
@@ -296,10 +439,12 @@ class MainController extends Controller
                         ->withInput();
         }
 
-        $userinfo = Siteuser::where('email_address','=',$request->email_address)->first();
+        $userinfo = Siteuser::where('email_address','=',$request->email_address)
+        ->where('isActive','=',1)
+        ->first();
 
         if(!$userinfo){
-            return back()->with('fail','We do not recognize your email address');
+            return back()->with('fail','We do not recognize your email address or your email is not verified');
         }else{
             //check password
             if(Hash::check($request->password, $userinfo->password)){
@@ -329,17 +474,17 @@ class MainController extends Controller
         
         $active_ads = Ads::where('isActive','=','1')->where('userid','=',$SiteUser)->count();
         $inactive_ads = Ads::where('isActive','=','0')->where('userid','=',$SiteUser)->count();
-        return view("user/myaccount",['userinfo' => $userinfo, 'active_ads'=>$active_ads,'inactive_ads'=>$inactive_ads]);
+        return view("user/myaccount",['Page_name'=>'myaccount','Page_data'=>'','userinfo' => $userinfo, 'active_ads'=>$active_ads,'inactive_ads'=>$inactive_ads]);
 
 
     }
     public function profile()
     {
-       return view("user/profile");
+       return view("user/profile",['Page_data'=>'','Page_name'=>'login']);
     }
     public function delete_account()
     {
-       return view("user/delete_account");
+       return view("user/delete_account" ,['Page_data'=>'','Page_name'=>'login']);
     }
 
 
@@ -352,11 +497,11 @@ class MainController extends Controller
         ->join('tbluser as user','user.id', '=', 'ads.userid')
         ->join('tbllocation as loc','loc.id', '=', 'ads.region_id') 
         ->join('tbllocation as loc1','loc1.id', '=', 'ads.location_id') 
-        ->select('ads.id','ads.title','user.fname as user','ads.created_at','ads.isActive','cat.category','loc.location as region','loc1.location as location')        
+        ->select('ads.id','ads.title','ads.title_slug','user.fname as user','ads.created_at','ads.isActive','cat.category','cat.category_slug','loc.location as region','loc1.location as location','loc1.location_slug as location_slug')        
         ->where('ads.userid', '=', $SiteUser)
-        ->paginate(10);
+        ->paginate(50);
   
-        return view('user/ads', ['ads' => $ads]);
+        return view('user/ads', ['Page_name'=>'user_ads', 'ads' => $ads, 'Page_data'=>'']);
     }
     
 
@@ -365,20 +510,24 @@ class MainController extends Controller
       $categories = Category::all();      
       $locations = Location::whereNull('parent')
        ->with(['children'])
+       ->orderby('location')
        ->get(); 
-      return view('user/postadd', ['categories' => $categories, 'locations' => $locations ]);       
+
+       $Page_data = Page::all()->where('page_slug', 'postadd')->first();       
+      return view('user/postadd', ['Page_name'=>'postadd', 'Page_data'=>$Page_data,'categories' => $categories, 'locations' => $locations ]);       
     }
 
     public function save_ad(Request $request)
     {
-         // return $request->all();
+          //return $request->all();
+          //die();
           $SiteUser = session('SiteUser');
  
                 
         $validator = Validator::make($request->all(), [
             'category'          => 'required',
-            'region'            => 'required',
-            'location'          => 'required',
+            'region'            => 'required|numeric|min:1',
+            'location'          => 'required|numeric|min:1',
             'zip'               => 'required',
             'area'              => 'required',
             'address'           => 'required',
@@ -386,39 +535,55 @@ class MainController extends Controller
             'ad_desc'           => 'required',
             'email_address'     => 'required',
             'phone_number'      => 'required',
+            'age'               => 'required|numeric|min:18|max:70',
         ]);
 
         if ($validator->fails()) {
-            return redirect('/postadd')
+            return redirect('/user/postadd')
                         ->withErrors($validator)
                         ->withInput();
         }
 
-        $ad_slug=strtolower(preg_replace('/[^a-zA-Z0-9-_\.]/','-', $request->ad_title));
+        //$ad_slug=strtolower(preg_replace('/[^a-zA-Z0-9-_\.]/','-', $request->ad_title));
+
+        if($request->whatsapp=='on')
+          { $whatsapp=1; }
+          else
+          { $whatsapp=0; }
+
+          $ad_desc = preg_replace('~<a(.*?)</a>~Usi', "", $request->ad_desc);
 
         $Ads                            =   new Ads;
         $Ads->userid                    =   $SiteUser; 
         $Ads->category_id               =   $request->category; 
-        $Ads->region_id                 =   $request->region;          
-        $Ads->location_id               =   $request->location; 
-        $Ads->title                     =   $request->ad_title; 
-        $Ads->title_slug                =   preg_replace('/-+/', '-', $ad_slug);
-        $Ads->description               =   $request->ad_desc;
-        $Ads->email                     =   $request->email_address;
-        $Ads->phone                     =   $request->phone_number;
-        $Ads->zip_code                  =   $request->zip;
-        $Ads->area                      =   $request->area;
-        $Ads->address                   =   $request->address; 
-        $Ads->meta_title                =   $request->meta_title;
-        $Ads->meta_description          =   $request->meta_description;
-        $Ads->isActive                  =   0; 
+         $Ads->region_id                 =   $request->region;          
+         $Ads->location_id               =   $request->location; 
+         $Ads->title                     =   $request->ad_title; 
+         $Ads->description               =   $ad_desc;
+         $Ads->email                     =   $request->email_address;
+         $Ads->phone                     =   $request->phone_number;
+         $Ads->user_age                  =   $request->age;
+         $Ads->zip_code                  =   $request->zip;
+         $Ads->area                      =   $request->area;
+         $Ads->address                   =   $request->address; 
+         $Ads->whatsapp_active           =   $whatsapp; 
+         $Ads->isActive                  =   1;
 
         $save=$Ads->save();
         $Adsid=$Ads->id;
+
+        $Adsid=$Ads->id;			
+			
+        $Ads = Ads::find($Adsid);
+        $Ads->title_slug               =   'es22'.$Adsid;
+        $Ads->save();
+
+
+
         if($save){
             //return back()->with('success','New User has been successfuly added to database');
             //return redirect('/adgallery')->with('success','New User has been successfuly added to database');
-            return redirect('/adgallery/'.$Adsid);
+            return redirect('/user/adgallery/'.$Adsid);
 
          }else{
              return back()->with('fail','Something went wrong, try again later');
@@ -431,8 +596,8 @@ class MainController extends Controller
 
         $validator = Validator::make($request->all(), [
             'category'          => 'required',
-            'region'            => 'required',
-            'location'          => 'required',
+            'region'            => 'required|numeric|min:1',
+            'location'          => 'required|numeric|min:1',
             'zip'               => 'required',
             'area'              => 'required',
             'address'           => 'required',
@@ -441,10 +606,11 @@ class MainController extends Controller
             'email_address'     => 'required|email|unique:tbluser,email_address',
             'password'          => 'required',
             'phone_number'      => 'required',
+            'age'               => 'required|numeric|min:18|max:70',
         ]);
 
         if ($validator->fails()) {
-            return redirect('/postadd')
+            return redirect('/user/postadd')
                         ->withErrors($validator)
                         ->withInput();
         }
@@ -466,7 +632,14 @@ class MainController extends Controller
             return back()->with('fail','Something went wrong, try again later');
          }
 
-            $userinfo = Siteuser::where('email_address','=',$request->email_address)->first();            
+            $userinfo = Siteuser::where('email_address','=',$request->email_address)->first();   
+            
+            if($request->whatsapp=='on')
+          { $whatsapp=1; }
+          else
+          { $whatsapp=0; }
+
+            $ad_desc = preg_replace('~<a(.*?)</a>~Usi', "", $request->ad_desc);
          
             $userId                         =   $userinfo->id;
             $Ads                            =   new Ads;           
@@ -475,24 +648,30 @@ class MainController extends Controller
             $Ads->category_id               =   $request->category; 
             $Ads->region_id                 =   $request->region;          
             $Ads->location_id               =   $request->location; 
-            $Ads->title                     =   $request->ad_title;
-            $Ads->title_slug                =   strtolower(preg_replace('/[^a-zA-Z0-9-_\.]/','-', $request->ad_title));
+            $Ads->title                     =   $request->ad_title; 
+            $Ads->description               =   $ad_desc;
             $Ads->email                     =   $request->email_address;
             $Ads->phone                     =   $request->phone_number;
+            $Ads->user_age                  =   $request->age;
             $Ads->zip_code                  =   $request->zip;
             $Ads->area                      =   $request->area;
             $Ads->address                   =   $request->address; 
-            $Ads->description               =   $request->ad_desc;
-            $Ads->meta_title                =   $request->meta_title;
-            $Ads->meta_description          =   $request->meta_description;
-            $Ads->isActive                  =   $request->isActive; 
+            $Ads->whatsapp_active           =   $whatsapp; 
+            $Ads->isActive                  =   1; 
 
             $save=$Ads->save();
             $Adsid=$Ads->id;
+			
+			
+			$Ads = Ads::find($Adsid);
+			$Ads->title_slug               =   'es22'.$Adsid;
+        	$Ads->save();
+			
+			
 
             if($save)
             {
-                 return redirect('/adgallery/'.$Adsid);
+                 return redirect('/user/adgallery/'.$Adsid);
             }
             else
             {
@@ -503,7 +682,7 @@ class MainController extends Controller
 
     public function adgallery($id)
     {
-        return view('user/adgallery',['adid' => $id]);
+        return view('user/adgallery',['Page_name'=>'adgallery', 'adid' => $id,'Page_data'=>'']);
 
     }
     
@@ -511,31 +690,66 @@ class MainController extends Controller
     public function savegallery(Request $request,$id)
     {
           // return $request->all();
-          //echo $id;
+           //die();
+
+           //$this->validate($request, [
+           // 'files' => 'required|image|mimes:jpg,jpeg,png,gif,svg',
+           // ]);
+
+           
+    		$path = public_path('user_images/'.$id);
+			
+			if(!File::isDirectory($path))
+            {
+			    File::makeDirectory($path, 0777, true, true);			  
+		 	} 
 
           if($request->hasfile('files'))
           {
              foreach($request->file('files') as $key => $file)
              {
-                $filename = $id."_".$file->getClientOriginalName();
-                $fileupload = $file->move(public_path('user_images'),$filename); 
+                $filename       =       $id."_".$file->getClientOriginalName();
+                $fileext        =       $file->getClientOriginalExtension();
+                $filename_rand  =       $id."_".substr(md5(microtime()), 0, 10).".".$fileext; 
+
+                $img = Image::make($file->path());
+
+                $img->resize(150, 150, function ($constraint) {
+                $constraint->aspectRatio();
+                });
+                //->save($path.'thumb_'.$filename_rand);
+                $img->save($path.'/thumb_'.$filename_rand); 
+                
+
+                $fileupload = $file->move($path,$filename_rand); 
 
                 $gallery                =   new Gallery();
   
                 $gallery->adid          =   $id; 
-                $gallery->ad_image      =   $filename; 
+                $gallery->ad_image      =   $id.'/'.$filename_rand; 
                 $gallery->save();
   
              }
           }
 
-          return redirect('/postsuccess/');
+          if($request->mode=='editgallery')
+          {
+            return redirect('/user/editgallery/'.$id);  
+          }
+          elseif($request->mode=='admineditgallery')
+          {
+            return redirect('/admin/editgallery/'.$id);  
+          }
+          else
+          {
+            return redirect('/user/postsuccess/');
+          }          
 
     }
 
     public function postsuccess()
     {
-        return view('user/adthanks');
+        return view('/user/adthanks', ['Page_name'=>'postsuccess', 'Page_data'=>'']);
 
     }
 
@@ -547,7 +761,9 @@ class MainController extends Controller
         $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
 
         return view('user/editad', 
-        [   'categories' => $categories, 
+        [   'Page_name'=>'editadd',
+            'Page_data'=>'',
+            'categories' => $categories, 
             'locations' => $locations, 
             'adinfo'=>$adinfo, 
             'child_locations'=>$child_locations ]
@@ -561,14 +777,15 @@ class MainController extends Controller
 
         $validator = Validator::make($request->all(), [
             'category'          => 'required',
-            'region'            => 'required',
-            'location'          => 'required',
+            'region'            => 'required|numeric|min:1',
+            'location'          => 'required|numeric|min:1',
             'zip'               => 'required',
             'area'              => 'required',
             'address'           => 'required',
             'ad_title'          => 'required',
             'ad_desc'           => 'required',
             'phone_number'      => 'required',
+            'age'               => 'required|numeric|min:18|max:70',
         ]);
 
         if ($validator->fails()) {
@@ -581,17 +798,21 @@ class MainController extends Controller
         else
         { $whatsapp=0; }
 
+        $ad_desc = preg_replace('~<a(.*?)</a>~Usi', "", $request->ad_desc);
+
         $Ads = Ads::find($id);
         $Ads->category_id               =   $request->category; 
         $Ads->region_id                 =   $request->region;          
         $Ads->location_id               =   $request->location; 
         $Ads->title                     =   $request->ad_title;
+		$Ads->title_slug               	=   'es22'.$id;
         $Ads->phone                     =   $request->phone_number;
         $Ads->zip_code                  =   $request->zip;
         $Ads->area                      =   $request->area;
         $Ads->address                   =   $request->address; 
-        $Ads->description               =   $request->ad_desc;
+        $Ads->description               =   $ad_desc;
         $Ads->whatsapp_active           =   $request->whatsapp; 
+        $Ads->isActive                  =   1; 
         $Ads->save();
 
         return redirect('/user/ads');
@@ -599,28 +820,24 @@ class MainController extends Controller
     }
     public function editgallery($id)
     {
-          $Gallery = Gallery::where('adid','=',$id)->get();
-        // $categories = Category::all();      
-        // $locations = Location::whereNull('parent')->orderby('sort_id')->get();
-        // $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get(); 
-
-        // return view('user/editad', 
-        // [   'categories' => $categories, 
-        //     'locations' => $locations, 
-        //     'adinfo'=>$adinfo, 
-        //     'child_locations'=>$child_locations ]
-        // );  
-        return view('user/editgallery',['gallery' => $Gallery]);  
+        $Gallery = Gallery::where('adid','=',$id)->get();
+        return view('user/editgallery',['Page_data'=>'','Page_name'=>'adgallery','adid' => $id,'gallery' => $Gallery]);  
     }
 
     public function deleteadimage($adid=null, $id = null)
     {
         $Gallery = Gallery::find($id);
         $Gallery->delete();
-
-        $Gallery = Gallery::where('adid','=',$adid)->get();
-        return view('user/editgallery',['gallery' => $Gallery]); 
+        return redirect('/user/editgallery/'.$adid);
     }
+
+    public function delete_ad($id = null)
+    {
+        $Ads = Ads::find($id);
+        $Ads->delete();
+        return redirect('/user/ads');
+    }
+
 
     
     public function sendmail()
@@ -629,19 +846,16 @@ class MainController extends Controller
             'first_name' => 'test',
             'last_name' => 'xyz',
             'address' => 'test xyz'
-        ];
-        //Mail::to('info@softproinc.clom')->send(new WelcomeMail($student_detail));
-        // return new WelcomeMail();
-        // Mail::to('info@softproinc.com')->send(new MyMail($student_detail));
-        //Mail::send('emails.welcome',  $student_detail, function new WelcomeMail($student_detail));
+        ]; 
 
-        $data = array('name'=>"Virat Gandhi");
-        Mail::send('emails.welcome', $data, function($message){
-            $message->to('info@softproinc.com', 'Tutorials Point')
-            ->subject('Laravel HTML Testing Mail');
-           // $message->from('info@softproinc.com','Virat Gandhi');
-        });
-        echo "HTML Email Sent. Check your inbox.";
+        $data = array(
+            'subject' => 'SubjectTesting Mail', 
+            'message'=> 'Smessage Mail' ,
+             );
+            Mail::to('jamestracy1980@gmail.com')->send(new WelcomeMail($data));
+            return back()->with('success', 'Sent Successfully !');
+            
+
     }
 
    

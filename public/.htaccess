@@ -18,4 +18,22 @@
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
+    Redirect 301 https://escortsear.ch/women-looking-for-men https://escortsear.ch/women-seeking-men
 </IfModule>
+
+
+RewriteEngine On
+
+# if /public/ is part of original URL then remove it
+RewriteCond %{THE_REQUEST} /public/(\S*) [NC]
+RewriteRule ^ /%1 [L,NE,R=301]
+
+# Handle Front Controller...
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^ index.php [L]
+
+#Redirect ##
+RewriteCond %{HTTP_HOST} ^escortsear\.ch$ [OR]
+RewriteCond %{HTTP_HOST} ^www\.escortsear\.ch$
+RewriteRule ^male\-escorts\/bangalore\/es223792$ "https\:\/\/escortsear\.ch\/male\-escorts\/bangalore" [R=301,L]

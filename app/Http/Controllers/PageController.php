@@ -46,8 +46,8 @@ class PageController extends Controller
         $page                               =   new Page;
         $page->page_name                    =   $request->page_name; 
         $page->page_slug                    =   strtolower($request->page_slug); 
-        $page->page_meta_title              =   $request->page_meta_title; 
-        $page->page_meta_description        =   $request->page_meta_description; 
+        $page->meta_title              =   $request->page_meta_title; 
+        $page->meta_description        =   $request->page_meta_description; 
         $page->page_description             =   $request->page_description;
         $page->isActive                     =   $request->isActive; 
 
@@ -68,15 +68,15 @@ class PageController extends Controller
     }
     public function update_page(Request $request, $id)
     {
-       // return $request->all();
-      //  die();
+        // return $request->all();
+        // die();
       $validator = Validator::make($request->all(), [
         'page_name' => 'required|unique:tblpages,page_name',
         'page_slug' => 'required|unique:tblpages,page_slug'
     ]);
 
     if ($validator->fails()) {
-        return redirect('admin/editpage')
+        return redirect('admin/editpage/'.$id)
                     ->withErrors($validator)
                     ->withInput();
     }
@@ -84,8 +84,8 @@ class PageController extends Controller
         $page = Page::find($id);
         $page->page_name                    =   $request->page_name; 
         $page->page_slug                    =   strtolower($request->page_slug); 
-        $page->page_meta_title              =   $request->page_meta_title; 
-        $page->page_meta_description        =   $request->page_meta_description; 
+        $page->meta_title                   =   $request->page_meta_title; 
+        $page->meta_description             =   $request->page_meta_description; 
         $page->page_description             =   $request->page_description;
         $page->isActive                     =   $request->isActive;  
 
@@ -110,34 +110,48 @@ class PageController extends Controller
     /////////////front/////////////////
 
     //public function pages($page=null)
-    public function pages($page=null)
+    public function pages($pagename)
     {
       
          $category = Category::orderby('sort_id')->get();      
          $location = Location::whereNull('parent')->orderby('sort_id')->get();
          $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();  
  
-         if($page!='')   
-         {
-            $page_data = Page::where('page_slug','=','terms-and-conditions')->first();
-             if(!$page_data)   
-             {
-                 return redirect('404');
-             }
-             else
-             {
-                 return view('pages', ['page'=>$page_data,'search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);
-             }
-         }   
-         else
-         {
-             return view('404');
- 
-         }         
+         $page_data = Page::where('page_slug','=',$pagename)->first();
+         return view('pages', ['Page_data'=>$page_data,'Page_name'=>'adgallery','search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);
+                   
     }
+
+    public function terms()
+    {
+         $category = Category::orderby('sort_id')->get();      
+         $location = Location::whereNull('parent')->orderby('sort_id')->get();
+         $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();   
+         $page_data = Page::where('page_slug','=','terms-and-conditions')->first();
+         return view('pages', ['Page_data'=>$page_data,'Page_name'=>'adgallery','search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);
+    }
+    public function privacy()
+    {
+         $category = Category::orderby('sort_id')->get();      
+         $location = Location::whereNull('parent')->orderby('sort_id')->get();
+         $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();   
+         $page_data = Page::where('page_slug','=','privacy-policy')->first();
+         return view('pages', ['Page_data'=>$page_data,'Page_name'=>'adgallery','search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);
+    }
+
+    public function contactus()
+    {
+         //return 'contact';
+         $category = Category::orderby('sort_id')->get();      
+         $location = Location::whereNull('parent')->orderby('sort_id')->get();
+         $child_locations = Location::whereNotNull('parent')->orderby('sort_id')->get();   
+         $page_data = Page::where('page_slug','=','contacts-us')->first();
+         return view('pages', ['Page_data'=>$page_data,'Page_name'=>'adgallery','search_categories' => $category,'search_locations' => $location, 'search_child_locations' => $child_locations ]);
+    }
+
     public function notfound()
     {      
-         return view('404');                
+         return view('404',['Page_data'=>'','Page_name'=>'',]);                
     }
 
 }

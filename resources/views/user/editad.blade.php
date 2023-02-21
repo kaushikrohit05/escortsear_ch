@@ -1,5 +1,24 @@
 @extends('layouts/frontend1')
 @section('content')
+<script src="https://cdn.tiny.cloud/1/ud89g26pvdzj62qi0v8wzbfn489krhmeiqppec8zmgwkkhvo/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  tinymce.init({
+    selector: 'textarea#ad_desc',
+    height: 500,
+    paste_enable_default_filters: true,
+    menubar: false,
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | blocks | ' +
+    'bold italic backcolor | alignleft aligncenter ' +
+    'alignright alignjustify | bullist numlist outdent indent | ' +
+    'removeformat | help',
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+  });
+  </script>
 <div class="row my-5">
   
   
@@ -106,7 +125,7 @@
           </div> 
           <div class="mb-3">
             <label  class="form-label">Ad Description*</label>
-            <textarea class="form-control" id="exampleFormControlTextarea1" name="ad_desc" rows="5">{{ $adinfo->description }}</textarea>
+            <textarea class="form-control" id="ad_desc" name="ad_desc" rows="5">{{ $adinfo->description }}</textarea>
             <span class="text-danger">@error('ad_desc')
               {{ $message }}
             @enderror</span> 
@@ -163,7 +182,7 @@
             </div>
             <div class="col-md-2 mb-3">
               <label class="form-label">Age*</label>
-              <input type="text" class="form-control" id="age" name="age" placeholder="Age" value="{{ $adinfo->area }}"  >  
+              <input type="text" class="form-control" id="age" name="age" placeholder="Age" value="{{ $adinfo->user_age }}"  >  
               <span class="text-danger">@error('age')
                 {{ $message }}
               @enderror</span>      

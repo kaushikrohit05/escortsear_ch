@@ -2,6 +2,6 @@
 
 @section('content')
 <h1>Dashboard</h1>
-{{ $LoggedUserInfo }}
+Welcome {{ $LoggedUserInfo['adminemail'] }}
 @endsection
 

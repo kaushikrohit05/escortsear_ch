@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Location;
+use App\Models\Catlocseo;
+use App\Models\Category;
  
 class LocationController extends Controller
 {
@@ -13,8 +15,10 @@ class LocationController extends Controller
          ->with(['children'])
          ->orderby('sort_id')
          ->paginate(10);
-        //dd($location);
+         $location = Location::whereNull('parent')->orderby('location')->get();
 
+       // dd($location);
+//
 
           return view('admin/locations', ['location' => $location]);
 
@@ -29,20 +33,45 @@ class LocationController extends Controller
     }
     public function save_location(Request $request)
     {
+        $category = Category::orderby('sort_id')->get();
+        //return view('admin/categories', ['categories' => $category]);
+        
         $location = new Location;
         $location->parent =$request->parent_location; 
         $location->location =$request->location; 
         $location->location_slug =$request->location_slug; 
         $location->save();
+        $location_id = $location->id;
 
-        return redirect('admin/locations');
+        foreach($category as $row)
+        {
+                $category = $row['category'];
+                $category_id = $row['id'];
+                 
+         
+
+ 
+        $Catlocseo                            = new Catlocseo;
+        $Catlocseo->category_id               = $category_id; 
+        $Catlocseo->location_id               = $location_id; 
+        $Catlocseo->meta_title                = $category.' in '.$request->location;
+        $Catlocseo->meta_description          = $category.' in '.$request->location;
+
+         $save=$Catlocseo->save();
+ 
+        }
+                
+
+         
+
+         return redirect('admin/locations');
 
     } 
     
     
     public function edit_location($id)
     {
-        $parent_locations = Location::whereNull('parent')->get();
+        $parent_locations = Location::whereNull('parent')->orderby('location')->get();
         $selected_location = Location::all()->where('id',$id)->first();
         return view('admin/edit_location', ['parent_locations' => $parent_locations, 'selected_location' => $selected_location]);
     }
@@ -52,11 +81,11 @@ class LocationController extends Controller
        // return $id;
         if($id!=0)
         {
-            $location = Location::where('parent',$id)->get()->toArray();
+            $location = Location::where('parent',$id)->orderby('location')->get()->toArray();
         }
         else
         {
-            $location = Location::whereNotNull ('parent')->get()->toArray();
+            $location = Location::whereNotNull ('parent')->orderby('location')->get()->toArray();
 
         }
         return $location;
@@ -79,7 +108,20 @@ class LocationController extends Controller
     {
         $location = Location::find($id);
         $location->delete();
+
+        
+       // Location::where('parent', $id)->delete();
+        Catlocseo::where('location_id', $id)->delete(); 
+
+        //Catlocseo::destroy('location_id',$id);
+        
+       // $Catlocseo = Catlocseo::where('location_id',$id)->get();
+       // $Catlocseo->delete();
+
         return redirect('admin/locations');
+
+
+
     }
 
 

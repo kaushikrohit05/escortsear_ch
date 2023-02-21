@@ -4,20 +4,7 @@
 <h1>Create User</h1>
 <form method="POST" action="{{ url('/admin/updateuser') }}/{{ $user->id }}" >
   @csrf
-    <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">First Name</label>
-        <input type="text" class="form-control"   aria-describedby="emailHelp"  name="fname" placeholder="First Name"   value="{{ $user->fname }}" >
-        <span class="text-danger">@error('fname')
-          {{ $message }}
-        @enderror</span>
-      </div>
-      <div class="mb-3">
-        <label for="exampleInputEmail1" class="form-label">Last Name</label>
-        <input type="text" class="form-control"   aria-describedby="emailHelp" name="lname" placeholder="Last Name"    value="{{ $user->lname }}">
-        <span class="text-danger">@error('lname')
-          {{ $message }}
-        @enderror</span>
-      </div>       
+     
     <div class="mb-3">
       <label for="exampleInputEmail1" class="form-label">Email address</label>
       <input type="text" class="form-control" aria-describedby="emailHelp"   name="email_address" placeholder="Email Address" disabled  value="{{ $user->email_address }}" >
@@ -35,8 +22,8 @@
     <div class="mb-3">
       <label  class="form-label">Staus</label>
       <select class="form-select" aria-label="Default select example" name="isActive">
-        <option value="1">Active</option>
-        <option value="2">Inactive</option>
+        <option value="1" @if ($user->isActive==1) selected  @endif>Active</option>
+        <option value="0" @if ($user->isActive!=1) selected  @endif>Inactive</option>
       </select>
     </div>
     <button type="submit" class="btn btn-primary">Submit</button>

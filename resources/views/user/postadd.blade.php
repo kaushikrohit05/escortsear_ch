@@ -1,6 +1,25 @@
 @extends('layouts/frontend1')
 
 @section('content')
+<script src="https://cdn.tiny.cloud/1/ud89g26pvdzj62qi0v8wzbfn489krhmeiqppec8zmgwkkhvo/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<script>
+  tinymce.init({
+    selector: 'textarea#ad_desc',
+    paste_enable_default_filters: true,
+    height: 500,
+    menubar: false,
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | blocks | ' +
+    'bold italic backcolor | alignleft aligncenter ' +
+    'alignright alignjustify | bullist numlist outdent indent | ' +
+    'removeformat | help',
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+  });
+  </script>
 <h1 class="text-center  my-5">Publish for free in just a few steps!</h1>
 <div class="row text-center my-5">
   <div class="col-4"><span class="fa-stack fa-1x">
@@ -26,9 +45,9 @@
   <div class="col">
     <form method="POST" action="
     @if(session()->has('SiteUser'))
-    {{ url('/savead') }}
+    /user/savead
     @else
-    {{ url('/saveadwithuser') }}
+    /user/saveadwithuser
     @endif
     " enctype="multipart/form-data" >
       @csrf
@@ -100,7 +119,7 @@
         </div> 
         <div class="mb-3">
           <label  class="form-label">Ad Description*</label>
-          <textarea class="form-control" id="exampleFormControlTextarea1" name="ad_desc" rows="5">{{ old('ad_desc') }}</textarea>
+          <textarea class="form-control" id="ad_desc" name="ad_desc" rows="5">{{ old('ad_desc') }}</textarea>
           <span class="text-danger">@error('ad_desc')
             {{ $message }}
           @enderror</span> 

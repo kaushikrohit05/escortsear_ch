@@ -1,8 +1,27 @@
 @extends('layouts/admin')
 
 @section('content')
-<h1>Create Ad</h1>
- 
+<script>
+  tinymce.init({
+    selector: 'textarea#ad_desc',
+    height: 500,
+    menubar: false,
+    plugins: [
+      'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+      'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+      'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+    ],
+    toolbar: 'undo redo | blocks | ' +
+    'bold italic backcolor | alignleft aligncenter ' +
+    'alignright alignjustify | bullist numlist outdent indent | ' +
+    'removeformat | help',
+    content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+  });
+  </script>
+<h1>Create New Ad</h1>
+
+
+
 <form method="POST" action="{{ url('/admin/savead') }}" enctype="multipart/form-data" >
     @csrf
     <div class="mb-3">
@@ -10,7 +29,7 @@
         <select class="form-select" aria-label="Default select" name="user">
             <option value="">Select User</option>
             @foreach ($users as $user)
-            <option value="{{ $user->id }}">{{ $user->fname }} {{ $user->lname }} ( {{ $user->email_address }} )</option>
+            <option value="{{ $user->id }}">{{ $user->email_address }}</option>
             @endforeach
           </select>
         <span class="text-danger">@error('user')
@@ -50,6 +69,34 @@
           {{ $message }}
         @enderror</span>
       </div>
+      <div class="row mb-3"> 
+        <div class="col-md-4">
+          <label class="form-label">ZIP*</label>
+          <input type="text" class="form-control" id="zip" name="zip" placeholder="ZIP" value="{{ old('zip') }}"  >
+          <span class="text-danger">@error('zip')
+            {{ $message }}
+          @enderror</span>
+        </div>
+        <div class="col-md-8">
+          <label  class="form-label">Area / District / Neighbourhood*</label>
+          <input type="text" class="form-control" id="area" name="area" placeholder="Area / District / Neighbourhood" value="{{ old('area') }}"  >
+          <span class="text-danger">@error('area')
+            {{ $message }}
+          @enderror</span>
+        </div>
+        </div>
+
+        <div class="mb-3">
+          <label class="form-label">Address*</label>
+          <input type="text" class="form-control" id="ad_title" name="address" placeholder="Address" value="{{ old('address') }}"  >  
+          <span class="text-danger">@error('address')
+            {{ $message }}
+          @enderror</span>      
+        </div> 
+
+
+
+
 
       <div class="mb-3">
         <label for="exampleInputEmail1" class="form-label">Ad Title</label>
@@ -60,24 +107,40 @@
       </div> 
       <div class="mb-3">
         <label  class="form-label">Ad Description</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" name="ad_desc" rows="3">{{ old('ad_desc') }}</textarea>
+        <textarea class="form-control" id="ad_desc" name="ad_desc" rows="3">{{ old('ad_desc') }}</textarea>
         <span class="text-danger">@error('ad_desc')
           {{ $message }}
         @enderror</span> 
       </div> 
-      <div class="mb-3">
-        <label for="formFile" class="form-label">Ad Image</label>
-        <input class="form-control" type="file" id="formFile" name="ad_image">
-      </div> 
+      <div class="row mb-3"> 
+           
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Phone Number*</label>
+          <input type="text" class="form-control" id="phone_number" name="phone_number" placeholder="Phone Number" value="{{ old('phone_number') }}"  >  
+          <span class="text-danger">@error('phone_number')
+            {{ $message }}
+          @enderror</span>      
+        </div>
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Age*</label>
+          <input type="text" class="form-control" id="age" name="age" placeholder="Age" value="{{ old('age') }}"  >  
+          <span class="text-danger">@error('age')
+            {{ $message }}
+          @enderror</span>      
+        </div>          
+        
+        <div class="col-md-2 mb-3">
+          <label class="form-label">Whatsapp</label>
+          <div class="form-check form-switch">
+            <input class="form-check-input" type="checkbox" role="switch" name="whatsapp" id="flexSwitchCheckChecked" checked value="1">
+            <label class="form-check-label" for="flexSwitchCheckChecked"></label>
+          </div>    
+        </div>
+        </div>
+
+
+
       
-      <div class="mb-3">
-        <label  class="form-label">Meta Title</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" name="meta_title" rows="3"></textarea>
-      </div>
-      <div class="mb-3">
-        <label  class="form-label">Meta Description</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" name="meta_description" rows="3"></textarea>
-      </div>
      <div class="mb-3">
         <label  class="form-label">Staus</label>
         <select class="form-select" aria-label="Default select example" name="isActive">

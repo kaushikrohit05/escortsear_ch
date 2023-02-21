@@ -1,6 +1,23 @@
 @extends('layouts/admin')
 
 @section('content')
+<script>
+tinymce.init({
+  selector: 'textarea#page_description',
+  height: 500,
+  menubar: false,
+  plugins: [
+    'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+    'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+    'insertdatetime', 'media', 'table', 'code', 'help', 'wordcount'
+  ],
+  toolbar: 'undo redo | blocks | ' +
+  'bold italic backcolor | alignleft aligncenter ' +
+  'alignright alignjustify | bullist numlist outdent indent | ' +
+  'removeformat | code |  help',
+  content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }'
+});
+</script>
 <h1>Add Page</h1>
  
 <form method="POST" action="{{ url('/admin/savepage') }}" >
@@ -30,7 +47,7 @@
       </div>
       <div class="mb-3">
         <label  class="form-label">Page Content</label>
-        <textarea class="form-control" id="exampleFormControlTextarea1" name="page_description" rows="3">{{ old('page_description') }}</textarea>
+        <textarea class="form-control" id="page_description" name="page_description" rows="3">{{ old('page_description') }}</textarea>
       </div> 
       
      <div class="mb-3">
